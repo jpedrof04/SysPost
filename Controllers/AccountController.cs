@@ -1,6 +1,7 @@
 using learnfds.Models;
 using learnfds.ViewModels;
 using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,12 +33,12 @@ namespace learnfds.Controllers
 
         private static (bool isValid, string? error) ValidatePhotoFile(IFormFile file)
         {
-            var extensoesPermitidas = new[] { ".jpg", ".png", ".gif", ".webp"};
+            var extensoesPermitidas = new[] { ".jpg", ".png", ".gif", ".webp" };
             var extesao = Path.GetExtension(file.FileName).ToLowerInvariant();
 
             if (!extensoesPermitidas.Contains(extesao))
                 return (false, "apenas imagens sao permitidas (.jpg, .png, .gif, .webp)");
-            
+
             if (file.Length > 2 * 1024 * 1024)
                 return (false, "a imagem deve ter no maximo 2MB");
 
@@ -59,7 +60,7 @@ namespace learnfds.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl= null)
+        public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
             ViewData["returnUrl"] = returnUrl;
 
@@ -90,19 +91,19 @@ namespace learnfds.Controllers
         {
             if (!ModelState.IsValid)
                 return View(model);
-            
+
             var usuario = new Usuario
             {
-              UserName = model.Email,
-              Email = model.Email,
-              NomeCompleto = model.NomeCompleto,
-              DataCadastro = DateTime.UtcNow,
-              EmailConfirmed = true  
+                UserName = model.Email,
+                Email = model.Email,
+                NomeCompleto = model.NomeCompleto,
+                DataCadastro = DateTime.UtcNow,
+                EmailConfirmed = true
             };
 
             var resultado = await _userManager.CreateAsync(usuario, model.Senha);
 
-            if(resultado.Succeeded)
+            if (resultado.Succeeded)
             {
                 await _userManager.AddToRoleAsync(usuario, "User"); //aq a role de Usuario simples é passada
                 await _signInManager.SignInAsync(usuario, isPersistent: false);
@@ -117,19 +118,93 @@ namespace learnfds.Controllers
 
 
         //logout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
 
-
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
 
         //perfil
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Perfill()
+        {
+            var usuario = await GetCurrentUserAsync();
+            if (usuario == null) return NotFound();
+
+            var roles = await _userManager.GetRolesAsync(usuario);
+
+            var vm = new PerfilViewModel
+            {
+                NomeCompleto = usuario.NomeCompleto,
+                Email = usuario.Email ?? "",
+                Bio = usuario.Bio,
+                FotoPerfil = usuario.FotoPerfil,
+                DataCadastro = usuario.DataCadastro,
+                Perfil = roles.FirstOrDefault() ?? "User"
+            };
+
+            return View(vm);
+        }
 
 
         //editar perfil
 
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> EditarPerfil()
+        {
+            var usuario = await GetCurrentUserAsync();
+            if (usuario == null) return NotFound();
 
+            var vm = new EditarPerfilViewModel
+            {
+                NomeCompleto = usuario.NomeCompleto,
+                Bio = usuario.Bio,
+                FotoAtual = usuario.FotoPerfil
+            };
+            return View(vm);
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> EditarPerfil(EditarPerfilViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
 
+            var usuario = await GetCurrentUserAsync();
+            if (usuario == null) return NotFound();
 
+            usuario.NomeCompleto = model.NomeCompleto;
+            usuario.Bio = model.Bio;
 
+            if (model.FotoArquivo != null && model.FotoArquivo.Length > 0)
+            {
+                var (isValid, error) = ValidatePhotoFile(model.FotoArquivo);
+                if (!isValid)
+                {
+                    ModelState.AddModelError("FotoArquivo", error!);
+                    model.FotoAtual = usuario.FotoPerfil;
+                    return View(model);
+                }
+
+                using var ms = new MemoryStream();
+                await model.FotoArquivo.CopyToAsync(ms);
+                usuario.FotoPerfil = ms.ToArray();
+            }
+
+            await _userManager.UpdateAsync(usuario);
+
+            TempData["Sucesso"] = "Perfil atualizado com sucesso!";
+            return RedirectToAction("Perfil");
+
+        }
     }
-}
 
+}

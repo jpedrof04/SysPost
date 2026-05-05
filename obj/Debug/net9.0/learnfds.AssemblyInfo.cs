@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("learnfds")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9f6f6154b7bae9dbe50818766717eb9b5fa95974")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ab8bf634758336668fcc23c41d12c892f37c843f")]
 [assembly: System.Reflection.AssemblyProductAttribute("learnfds")]
 [assembly: System.Reflection.AssemblyTitleAttribute("learnfds")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
