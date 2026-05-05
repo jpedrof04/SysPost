@@ -1,24 +1,46 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using learnfds.Models;
+using learnfds.ViewModels;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
-namespace learnfds.Controllers;
-
-public class HomeController : Controller
+namespace learnfds.Controllers
 {
-    public IActionResult Index()
+    /// <summary>
+    /// Página inicial da aplicação.
+    /// Se o usuário estiver logado, exibe informações personalizadas por perfil.
+    /// </summary>
+    public class HomeController : Controller
     {
-        return View();
-    }
+        private readonly UserManager<Usuario> _userManager;
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+        public HomeController(UserManager<Usuario> userManager)
+        {
+            _userManager = userManager;
+        }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        public async Task<IActionResult> Index()
+        {
+            // Se não está logado, exibe a home pública
+            if (User.Identity?.IsAuthenticated != true)
+                return View();
+
+            // Se está logado, busca dados do usuário e passa para a view
+            var usuario = await _userManager.GetUserAsync(User);
+            if (usuario == null) return View();
+
+            var roles = await _userManager.GetRolesAsync(usuario);
+
+            var vm = new PerfilViewModel
+            {
+                NomeCompleto = usuario.NomeCompleto,
+                Email = usuario.Email ?? "",
+                Bio = usuario.Bio,
+                FotoPerfil = usuario.FotoPerfil,
+                DataCadastro = usuario.DataCadastro,
+                Perfil = roles.FirstOrDefault() ?? "User"
+            };
+
+            return View(vm);
+        }
     }
 }
