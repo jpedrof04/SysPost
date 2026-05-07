@@ -45,7 +45,7 @@ namespace learnfds.ViewModels
 
         [Required(ErrorMessage = "A confirmação de senha é obrigatoria.")]
         [DataType(DataType.Password)]
-        [Compare("senha", ErrorMessage = "as senhas sao diferentes")]
+        [Compare("Senha", ErrorMessage = "as senhas sao diferentes")]
         [Display(Name = "Confirmar Senha")]
         public string ConfirmarSenha { get; set; } = string.Empty;
 

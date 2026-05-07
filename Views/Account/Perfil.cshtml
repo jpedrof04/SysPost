@@ -1,0 +1,48 @@
+@model learnfds.ViewModels.PerfilViewModel
+@{
+    ViewData["Title"] = "Meu Perfil";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center p-4">
+
+                @* Foto de perfil — renderiza os bytes do banco como base64 *@
+                @if (Model.FotoPerfil != null && Model.FotoPerfil.Length > 0)
+                {
+                    var base64 = Convert.ToBase64String(Model.FotoPerfil);
+                    <img src="data:image;base64,@base64"
+                         class="rounded-circle mb-3"
+                         style="width:120px;height:120px;object-fit:cover;"
+                         alt="Foto de perfil" />
+                }
+                else
+                {
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width:120px;height:120px;">
+                        <i class="bi bi-person-fill text-white" style="font-size:3rem;"></i>
+                    </div>
+                }
+
+                <h4 class="mb-1">@Model.NomeCompleto</h4>
+                <p class="text-muted mb-1"><i class="bi bi-envelope me-1"></i>@Model.Email</p>
+                <span class="badge bg-primary mb-3">@Model.Perfil</span>
+
+                @if (!string.IsNullOrEmpty(Model.Bio))
+                {
+                    <p class="text-muted">@Model.Bio</p>
+                }
+
+                <p class="text-muted small">
+                    <i class="bi bi-calendar me-1"></i>
+                    Membro desde @Model.DataCadastro.ToString("dd/MM/yyyy")
+                </p>
+
+                <a asp-action="EditarPerfil" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil me-1"></i>Editar Perfil
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

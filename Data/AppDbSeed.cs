@@ -5,6 +5,7 @@ using Microsoft.Identity.Client;
 
 namespace learnfds.Data
 {
+    
     public class AppDbSeed
     {
         //metodo original - us o DI ( para o banco principal )
@@ -23,7 +24,7 @@ namespace learnfds.Data
 
             var roleManager = new RoleManager<IdentityRole>(
                 roleStore,
-                new IRoleValidator<IdentityRole>[] { new RoleValidator<IdentityRole>},
+                new IRoleValidator<IdentityRole>[] { new RoleValidator<IdentityRole>()},
                 new UpperInvariantLookupNormalizer(),
                 new IdentityErrorDescriber(),
                 null!

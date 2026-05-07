@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace learnfds.Controllers
+namespace learnfds.Controllers 
 {
     //gerencia autenticação: login, registro, logout e perfil
     public class AccountController : Controller
@@ -33,11 +33,11 @@ namespace learnfds.Controllers
 
         private static (bool isValid, string? error) ValidatePhotoFile(IFormFile file)
         {
-            var extensoesPermitidas = new[] { ".jpg", ".png", ".gif", ".webp" };
+            var extensoesPermitidas = new[] { ".jpg", ".png", ".gif", ".jpeg", ".webp" };
             var extesao = Path.GetExtension(file.FileName).ToLowerInvariant();
 
             if (!extensoesPermitidas.Contains(extesao))
-                return (false, "apenas imagens sao permitidas (.jpg, .png, .gif, .webp)");
+                return (false, "apenas imagens sao permitidas (.jpg, .png, .gif, .jpeg, .webp)");
 
             if (file.Length > 2 * 1024 * 1024)
                 return (false, "a imagem deve ter no maximo 2MB");
@@ -62,7 +62,7 @@ namespace learnfds.Controllers
 
         public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
         {
-            ViewData["returnUrl"] = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl;
 
             if (!ModelState.IsValid)
                 return View(model);
@@ -85,7 +85,18 @@ namespace learnfds.Controllers
 
         // ----- REGISTRO -------
 
+
         [HttpGet]
+        public IActionResult Register()
+        {
+            if (User.Identity?.IsAuthenticated == true)
+                return RedirectToAction("Index", "Home");
+
+            return View();
+        }
+
+
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -131,7 +142,7 @@ namespace learnfds.Controllers
         //perfil
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Perfill()
+        public async Task<IActionResult> Perfil()
         {
             var usuario = await GetCurrentUserAsync();
             if (usuario == null) return NotFound();

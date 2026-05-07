@@ -1,8 +1,191 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model learnfds.ViewModels.PerfilViewModel
+@{
+    ViewData["Title"] = "Início";
+    bool logado = User.Identity?.IsAuthenticated == true;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (!logado)
+{
+    <!-- ══════════ HOME PÚBLICA (visitante) ══════════ -->
+    <div class="text-center py-5">
+        <h1 class="display-4 fw-bold">Bem-vindo ao FDS</h1>
+        <p class="lead text-muted mt-3">
+            Um projeto de estudo completo em <strong>ASP.NET Core MVC</strong> com Identity,
+            autenticação por roles, upload de foto e banco de dados SQL Server.
+        </p>
+        <hr class="w-25 mx-auto my-4" />
+        <p class="text-muted">
+            Este sistema possui duas áreas distintas: <strong>Administrador</strong> e <strong>Usuário</strong>.
+            Faça login para acessar sua área personalizada.
+        </p>
+        <div class="mt-4 d-flex justify-content-center gap-3">
+            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+            </a>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary btn-lg px-5">
+                <i class="bi bi-person-plus me-2"></i>Registrar
+            </a>
+        </div>
+    </div>
+
+    <!-- Seção explicativa -->
+    <div class="row mt-5 g-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-shield-lock text-warning fs-1"></i>
+                    <h5 class="mt-3">Área Admin</h5>
+                    <p class="text-muted">Gerencie usuários, altere roles e monitore o sistema.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-person-circle text-primary fs-1"></i>
+                    <h5 class="mt-3">Área do Usuário</h5>
+                    <p class="text-muted">Acesse seu painel personalizado, edite seu perfil e foto.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-database-check text-success fs-1"></i>
+                    <h5 class="mt-3">Banco de Dados</h5>
+                    <p class="text-muted">SQL Server com Entity Framework Core, Migrations e Seed automático.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- ══════════ HOME PERSONALIZADA (logado) ══════════ -->
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h2 class="fw-bold mb-0">
+                Olá, <span class="text-primary">@Model.NomeCompleto</span> 👋
+            </h2>
+            <p class="text-muted mt-1">Bem-vindo de volta ao FDS!</p>
+        </div>
+    </div>
+
+    <!-- Card de perfil -->
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center p-4">
+                <!-- Foto de perfil -->
+                @if (Model.FotoPerfil != null && Model.FotoPerfil.Length > 0)
+                {
+                    var base64 = Convert.ToBase64String(Model.FotoPerfil);
+                    <img src="data:image;base64,@base64" alt="Foto de perfil"
+                         class="rounded-circle mx-auto d-block mb-3"
+                         style="width:110px;height:110px;object-fit:cover;border:3px solid #dee2e6;" />
+                }
+                else
+                {
+                    <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3 bg-secondary text-white"
+                         style="width:110px;height:110px;font-size:2.5rem;">
+                        <i class="bi bi-person"></i>
+                    </div>
+                }
+
+                <h5 class="mb-0">@Model.NomeCompleto</h5>
+                <small class="text-muted">@Model.Email</small>
+
+                <!-- Badge de perfil -->
+                @if (Model.Perfil == "Admin")
+                {
+                    <div class="mt-2">
+                        <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                            <i class="bi bi-shield-lock me-1"></i>Administrador
+                        </span>
+                    </div>
+                }
+                else
+                {
+                    <div class="mt-2">
+                        <span class="badge bg-primary fs-6 px-3 py-2">
+                            <i class="bi bi-person me-1"></i>Usuário
+                        </span>
+                    </div>
+                }
+
+                <a asp-controller="Account" asp-action="EditarPerfil" class="btn btn-outline-primary btn-sm mt-3 w-100">
+                    <i class="bi bi-pencil me-1"></i>Editar Perfil
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <!-- Informações do perfil -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-transparent border-0 pt-3">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2 text-primary"></i>Informações da Conta</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Nome</dt>
+                        <dd class="col-sm-8">@Model.NomeCompleto</dd>
+
+                        <dt class="col-sm-4 text-muted">E-mail</dt>
+                        <dd class="col-sm-8">@Model.Email</dd>
+
+                        <dt class="col-sm-4 text-muted">Perfil</dt>
+                        <dd class="col-sm-8">@Model.Perfil</dd>
+
+                        <dt class="col-sm-4 text-muted">Membro desde</dt>
+                        <dd class="col-sm-8">@Model.DataCadastro.ToString("dd/MM/yyyy")</dd>
+
+                        @if (!string.IsNullOrEmpty(Model.Bio))
+                        {
+                            <dt class="col-sm-4 text-muted">Bio</dt>
+                            <dd class="col-sm-8">@Model.Bio</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Painel de acesso rápido por role -->
+            @if (Model.Perfil == "Admin")
+            {
+                <div class="card border-warning shadow-sm">
+                    <div class="card-header bg-warning text-dark border-0">
+                        <h6 class="mb-0"><i class="bi bi-shield-lock me-2"></i>Acesso de Administrador</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Você tem acesso completo ao painel administrativo.</p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a asp-controller="Admin" asp-action="Index" class="btn btn-warning btn-sm">
+                                <i class="bi bi-speedometer2 me-1"></i>Dashboard Admin
+                            </a>
+                            <a asp-controller="Admin" asp-action="Usuarios" class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-people me-1"></i>Gerenciar Usuários
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card border-primary shadow-sm">
+                    <div class="card-header bg-primary text-white border-0">
+                        <h6 class="mb-0"><i class="bi bi-person me-2"></i>Área do Usuário</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Bem-vindo à sua área pessoal!</p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a asp-controller="User" asp-action="Index" class="btn btn-primary btn-sm">
+                                <i class="bi bi-house me-1"></i>Meu Painel
+                            </a>
+                            <a asp-controller="Account" asp-action="Perfil" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-person-gear me-1"></i>Meu Perfil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

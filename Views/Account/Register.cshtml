@@ -1,0 +1,71 @@
+@model learnfds.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Criar Conta";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent text-center py-3">
+                <h4 class="mb-0"><i class="bi bi-person-plus me-2"></i>Criar Conta</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-controller="Account" asp-action="Register" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="NomeCompleto" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input asp-for="NomeCompleto" class="form-control" placeholder="Seu nome completo" />
+                        </div>
+                        <span asp-validation-for="NomeCompleto" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" class="form-control" placeholder="seu@email.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Senha" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input asp-for="Senha" class="form-control" placeholder="Mínimo 6 caracteres" />
+                        </div>
+                        <span asp-validation-for="Senha" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ConfirmarSenha" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                            <input asp-for="ConfirmarSenha" class="form-control" placeholder="Repita a senha" />
+                        </div>
+                        <span asp-validation-for="ConfirmarSenha" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 mb-3">
+                        <i class="bi bi-person-check me-2"></i>Criar Conta
+                    </button>
+
+                    <div class="text-center">
+                        <a asp-action="Login" class="text-decoration-none">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Já tem conta? Entrar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
