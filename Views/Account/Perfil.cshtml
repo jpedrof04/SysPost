@@ -27,7 +27,7 @@
 
                 <h4 class="mb-1">@Model.NomeCompleto</h4>
                 <p class="text-muted mb-1"><i class="bi bi-envelope me-1"></i>@Model.Email</p>
-                <span class="badge bg-primary mb-3">@Model.Perfil</span>
+                <span class="badge bg-warning text-dark mb-3">@Model.Perfil</span>
 
                 @if (!string.IsNullOrEmpty(Model.Bio))
                 {
@@ -39,7 +39,7 @@
                     Membro desde @Model.DataCadastro.ToString("dd/MM/yyyy")
                 </p>
 
-                <a asp-action="EditarPerfil" class="btn btn-outline-primary">
+                <a asp-action="EditarPerfil" class="btn btn-outline-warning">
                     <i class="bi bi-pencil me-1"></i>Editar Perfil
                 </a>
             </div>
