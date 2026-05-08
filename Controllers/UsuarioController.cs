@@ -1,9 +1,9 @@
-using learnfds.Models;
+using SysPost.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace learnfds.Controllers;
+namespace SysPost.Controllers;
 
 [Authorize]
 //area do usuario commum - acessivel por qualquer user autenticado

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace learnfds.Migrations
+namespace SysPost.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

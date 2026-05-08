@@ -1,6 +1,6 @@
 
 
-namespace learnfds.ViewModels
+namespace SysPost.ViewModels
 {
     public class PerfilViewModel
     {

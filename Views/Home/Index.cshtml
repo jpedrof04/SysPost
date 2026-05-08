@@ -1,4 +1,4 @@
-﻿@model learnfds.ViewModels.PerfilViewModel
+﻿@model SysPost.ViewModels.PerfilViewModel
 @{
     ViewData["Title"] = "Início";
     bool logado = User.Identity?.IsAuthenticated == true;
@@ -8,7 +8,7 @@
 {
     <!-- ══════════ HOME PÚBLICA (visitante) ══════════ -->
     <div class="text-center py-5">
-        <h1 class="display-4 fw-bold">Bem-vindo ao FDS</h1>
+        <h1 class="display-4 fw-bold">Bem-vindo ao SysPost</h1>
         <p class="lead text-muted mt-3">
             Um projeto de estudo completo em <strong>ASP.NET Core MVC</strong> com Identity,
             autenticação por roles, upload de foto e banco de dados SQL Server.
@@ -19,7 +19,7 @@
             Faça login para acessar sua área personalizada.
         </p>
         <div class="mt-4 d-flex justify-content-center gap-3">
-            <a asp-controller="Account" asp-action="Login" class="btn btn-warning btn-lg px-5">
+            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg px-5">
                 <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
             </a>
             <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary btn-lg px-5">
@@ -31,7 +31,7 @@
     <!-- Seção explicativa -->
     <div class="row mt-5 g-4">
         <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card h-100 shadow-sm">
                 <div class="card-body text-center p-4">
                     <i class="bi bi-shield-lock text-warning fs-1"></i>
                     <h5 class="mt-3">Área Admin</h5>
@@ -40,16 +40,16 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card h-100 shadow-sm">
                 <div class="card-body text-center p-4">
-                    <i class="bi bi-person-circle text-warning fs-1"></i>
+                    <i class="bi bi-person-circle text-primary fs-1"></i>
                     <h5 class="mt-3">Área do Usuário</h5>
                     <p class="text-muted">Acesse seu painel personalizado, edite seu perfil e foto.</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
+            <div class="card h-100 shadow-sm">
                 <div class="card-body text-center p-4">
                     <i class="bi bi-database-check text-success fs-1"></i>
                     <h5 class="mt-3">Banco de Dados</h5>
@@ -65,9 +65,9 @@ else
     <div class="row align-items-center mb-4">
         <div class="col">
             <h2 class="fw-bold mb-0">
-                Olá, <span class="text-warning">@Model.NomeCompleto</span> 👋
+                Olá, <span class="text-primary">@Model.NomeCompleto</span> 👋
             </h2>
-            <p class="text-muted mt-1">Bem-vindo de volta ao FDS!</p>
+            <p class="text-muted mt-1">Bem-vindo de volta ao SysPost!</p>
         </div>
     </div>
 
@@ -106,13 +106,13 @@ else
                 else
                 {
                     <div class="mt-2">
-                        <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                        <span class="badge bg-primary fs-6 px-3 py-2">
                             <i class="bi bi-person me-1"></i>Usuário
                         </span>
                     </div>
                 }
 
-                <a asp-controller="Account" asp-action="EditarPerfil" class="btn btn-outline-warning btn-sm mt-3 w-100">
+                <a asp-controller="Account" asp-action="EditarPerfil" class="btn btn-outline-primary btn-sm mt-3 w-100">
                     <i class="bi bi-pencil me-1"></i>Editar Perfil
                 </a>
             </div>
@@ -122,7 +122,7 @@ else
             <!-- Informações do perfil -->
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-transparent border-0 pt-3">
-                    <h5 class="mb-0"><i class="bi bi-info-circle me-2 text-warning"></i>Informações da Conta</h5>
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2 text-primary"></i>Informações da Conta</h5>
                 </div>
                 <div class="card-body">
                     <dl class="row mb-0">
@@ -169,17 +169,17 @@ else
             }
             else
             {
-                <div class="card border-warning shadow-sm">
-                    <div class="card-header bg-warning text-dark border-0">
+                <div class="card border-primary shadow-sm">
+                    <div class="card-header bg-primary text-white border-0">
                         <h6 class="mb-0"><i class="bi bi-person me-2"></i>Área do Usuário</h6>
                     </div>
                     <div class="card-body">
                         <p class="text-muted mb-3">Bem-vindo à sua área pessoal!</p>
                         <div class="d-flex gap-2 flex-wrap">
-                            <a asp-controller="User" asp-action="Index" class="btn btn-warning btn-sm">
+                            <a asp-controller="User" asp-action="Index" class="btn btn-primary btn-sm">
                                 <i class="bi bi-house me-1"></i>Meu Painel
                             </a>
-                            <a asp-controller="Account" asp-action="Perfil" class="btn btn-outline-warning btn-sm">
+                            <a asp-controller="Account" asp-action="Perfil" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-person-gear me-1"></i>Meu Perfil
                             </a>
                         </div>

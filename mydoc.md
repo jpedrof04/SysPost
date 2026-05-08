@@ -25,8 +25,8 @@ vou usar DbSet tambem pra simplificar
 
 **Data/AppDbSeed**
 criar roles admin e user e usuarios iniciais
-**admin**: admin@fds.com | Admin@123
-**user**:  user@fds.com  | User@123
+**admin**: admin@syspost.com | Admin@123
+**user**:  user@syspost.com  | User@123
 
 **ViewModels**
 modulos de formulario
@@ -44,3 +44,6 @@ modulos de formulario
  **VISUALMENTE, FLUXO DO PROGRAMA:**
  ### HTTPREQUEST => PROGRAM.CS (MIDDLEWARE PIPELINE) => ROUTING ( CONTROLLER/ACTION) => VIEWMODEL ( VALIDAÇÃO COM DATAANNOTATIONS)
  ### => IDENTITY ( USERMANAGER/SINGINMANAGER) => APPDBCONTEXT ( SQLSERVER ) => VIEW RESULT
+
+ === Viktor Young Pavlovich ===
+ dot

@@ -4891,11 +4891,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\alunobcc09\\Desktop\\MY-WS\\mvc\\learnfds\\learnfds.csproj",
-      "projectName": "learnfds",
-      "projectPath": "C:\\Users\\alunobcc09\\Desktop\\MY-WS\\mvc\\learnfds\\learnfds.csproj",
+      "projectUniqueName": "C:\\Users\\alunobcc09\\Desktop\\MY-WS\\mvc\\SysPost\\SysPost.csproj",
+      "projectName": "SysPost",
+      "projectPath": "C:\\Users\\alunobcc09\\Desktop\\MY-WS\\mvc\\SysPost\\SysPost.csproj",
       "packagesPath": "C:\\Users\\alunobcc09\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\alunobcc09\\Desktop\\MY-WS\\mvc\\learnfds\\obj\\",
+      "outputPath": "C:\\Users\\alunobcc09\\Desktop\\MY-WS\\mvc\\SysPost\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

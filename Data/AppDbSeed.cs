@@ -1,9 +1,9 @@
 using System.ComponentModel;
-using learnfds.Models;
+using SysPost.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Identity.Client;
 
-namespace learnfds.Data
+namespace SysPost.Data
 {
     
     public class AppDbSeed

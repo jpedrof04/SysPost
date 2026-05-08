@@ -1,11 +1,11 @@
-using learnfds.Models;
-using learnfds.ViewModels;
+using SysPost.Models;
+using SysPost.ViewModels;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace learnfds.Controllers 
+namespace SysPost.Controllers 
 {
     //gerencia autenticação: login, registro, logout e perfil
     public class AccountController : Controller
@@ -95,7 +95,7 @@ namespace learnfds.Controllers
             return View();
         }
 
-
+ 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)

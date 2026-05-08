@@ -1,9 +1,9 @@
 
-using learnfds.Models;
+using SysPost.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace learnfds.Data
+namespace SysPost.Data
 {
     public class AppDbContext : IdentityDbContext<Usuario>
     {

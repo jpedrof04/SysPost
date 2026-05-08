@@ -1,0 +1,358 @@
+{
+  "nome_projeto": "SysPost",
+  "descricao": "Aplicação web ASP.NET Core MVC 9.0 de estudo, com autenticação/autorização via Identity, roles Admin/User, upload de foto de perfil e banco SQL Server.",
+  "versao": "1.0.0",
+  "framework": {
+    "plataforma": ".NET 9.0",
+    "sdk": "Microsoft.NET.Sdk.Web",
+    "linguagem": "C# 12",
+    "orm": "Entity Framework Core 9.0.13",
+    "bd": "SQL Server",
+    "frontend": "Bootstrap 5 (dark theme), jQuery, jQuery Validation, Bootstrap Icons, Google Fonts (Nunito)",
+    "autenticacao": "ASP.NET Core Identity com cookies"
+  },
+  "dependencias_nuget": [
+    { "pacote": "Microsoft.AspNetCore.Identity.EntityFrameworkCore", "versao": "9.0.13", "funcao": "Armazenamento do Identity via EF Core" },
+    { "pacote": "Microsoft.EntityFrameworkCore.SqlServer", "versao": "9.0.13", "funcao": "Provider SQL Server para EF Core" },
+    { "pacote": "Microsoft.EntityFrameworkCore.Design", "versao": "9.0.13", "funcao": "Suporte a migrations (dev)" },
+    { "pacote": "Microsoft.EntityFrameworkCore.Tools", "versao": "9.0.13", "funcao": "Ferramentas CLI de migrations (dev)" }
+  ],
+  "arquitetura": {
+    "padrao": "MVC (Model-View-Controller)",
+    "camadas": [
+      { "nome": "Models", "descricao": "Entidades do domínio (Usuario, ErrorViewModel)" },
+      { "nome": "ViewModels", "descricao": "Modelos específicos para as views com validação" },
+      { "nome": "Controllers", "descricao": "Controladores que processam requisições HTTP" },
+      { "nome": "Views", "descricao": "Templates Razor (.cshtml) para renderização HTML" },
+      { "nome": "Data", "descricao": "DbContext e Seed do banco" },
+      { "nome": "Migrations", "descricao": "Migrations do EF Core (code-first)" },
+      { "nome": "wwwroot", "descricao": "Arquivos estáticos (CSS, JS, libs, imagens)" }
+    ]
+  },
+  "fluxo_requisicao": {
+    "pipeline_middleware": [
+      "app.UseExceptionHandler (erros em producao)",
+      "app.UseHttpsRedirection",
+      "app.UseRouting",
+      "app.UseAuthentication (autenticacao por cookie)",
+      "app.UseAuthorization (autorizacao por role)",
+      "app.MapStaticAssets / UseStaticFiles",
+      "app.MapControllerRoute (default: {controller=Home}/{action=Index}/{id?})"
+    ],
+    "seed_banco": "No startup, aplica migrations automaticamente e executa AppDbSeed.InicializarAsync para criar roles e usuarios padrao"
+  },
+  "banco_de_dados": {
+    "provedor": "SQL Server",
+    "connection_string_principal": "Server=DSKBCC09\\SQLEXPRESS;Database=fsapp;User Id=sa;Password=!Abc123;TrustServerCertificate=True;Encrypt=False;",
+    "connection_string_secundaria": "Server=(localdb)\\MSSQLLocalDB;Database=fsapp;Integrated Security=true;TrustServerCertificate=True;",
+    "abordagem": "Code-First com Migrations",
+    "tabelas_criadas": {
+      "AspNetUsers": "Tabela de usuarios (Identity + campos customizados)",
+      "AspNetRoles": "Tabela de papeis (Admin, User)",
+      "AspNetUserRoles": "Relacionamento N:N entre usuarios e papeis",
+      "AspNetRoleClaims": "Claims associados a papeis",
+      "AspNetUserClaims": "Claims associados a usuarios",
+      "AspNetUserLogins": "Logins externos (OAuth, etc)",
+      "AspNetUserTokens": "Tokens (reset de senha, etc)"
+    }
+  },
+  "models": {
+    "Usuario": {
+      "arquivo": "Models/Usuario.cs",
+      "herda": "IdentityUser (ASP.NET Core Identity)",
+      "propriedades_adicionais": [
+        { "nome": "NomeCompleto", "tipo": "string", "descricao": "Nome completo do usuario" },
+        { "nome": "FotoPerfil", "tipo": "byte[]?", "descricao": "Foto armazenada como byte array na coluna varbinary(max)" },
+        { "nome": "DataCadastro", "tipo": "DateTime", "descricao": "Data de cadastro, padrao DateTime.Now" },
+        { "nome": "Bio", "tipo": "string?", "descricao": "Biografia do usuario" }
+      ]
+    },
+    "ErrorViewModel": {
+      "arquivo": "Models/ErrorViewModel.cs",
+      "propriedades": [
+        { "nome": "RequestId", "tipo": "string?" }
+      ]
+    }
+  },
+  "viewmodels": [
+    {
+      "nome": "LoginViewModel",
+      "arquivo": "ViewModels/LoginViewModel.cs",
+      "propriedades": [
+        { "nome": "Email", "tipo": "string", "validacao": "Required, EmailAddress" },
+        { "nome": "Senha", "tipo": "string", "validacao": "Required, DataType.Password" },
+        { "nome": "LembrarMe", "tipo": "bool", "validacao": "Nenhuma", "descricao": "Persistir cookie de login" }
+      ]
+    },
+    {
+      "nome": "RegisterViewModel",
+      "arquivo": "ViewModels/LoginViewModel.cs",
+      "propriedades": [
+        { "nome": "NomeCompleto", "tipo": "string", "validacao": "Required, StringLength(200)" },
+        { "nome": "Email", "tipo": "string", "validacao": "Required, EmailAddress" },
+        { "nome": "Senha", "tipo": "string", "validacao": "Required, StringLength(6-100)" },
+        { "nome": "ConfirmarSenha", "tipo": "string", "validacao": "Required, Compare(Senha)" }
+      ]
+    },
+    {
+      "nome": "PerfilViewModel",
+      "arquivo": "ViewModels/PerfilViewModel.cs",
+      "propriedades": [
+        { "nome": "NomeCompleto", "tipo": "string" },
+        { "nome": "Email", "tipo": "string" },
+        { "nome": "Bio", "tipo": "string?" },
+        { "nome": "FotoPerfil", "tipo": "byte[]?" },
+        { "nome": "DataCadastro", "tipo": "DateTime" },
+        { "nome": "Perfil", "tipo": "string", "descricao": "Nome da role (Admin/User)" }
+      ]
+    },
+    {
+      "nome": "EditarPerfilViewModel",
+      "arquivo": "ViewModels/EditarPerfilViewModel.cs",
+      "propriedades": [
+        { "nome": "NomeCompleto", "tipo": "string", "validacao": "Required, StringLength(200)" },
+        { "nome": "Bio", "tipo": "string?" },
+        { "nome": "FotoArquivo", "tipo": "IFormFile?", "descricao": "Arquivo enviado pelo usuario no formulario" },
+        { "nome": "FotoAtual", "tipo": "byte[]?", "descricao": "Exibe a foto existente na tela de edicao" }
+      ]
+    }
+  ],
+  "controllers": [
+    {
+      "nome": "HomeController",
+      "arquivo": "Controllers/HomeController.cs",
+      "rota": "/Home/{action=Index}/{id?}",
+      "autorizacao": "Nenhuma (acesso publico)",
+      "injeta": "UserManager<Usuario>",
+      "acoes": [
+        {
+          "metodo": "GET Index",
+          "comportamento": "Se usuario nao autenticado, exibe landing page com cards sobre o sistema. Se autenticado, carrega dados do usuario + roles e envia PerfilViewModel para view personalizada"
+        }
+      ]
+    },
+    {
+      "nome": "AccountController",
+      "arquivo": "Controllers/AccountController.cs",
+      "rota": "/Account/{action}/{id?}",
+      "injeta": "UserManager<Usuario>, SignInManager<Usuario>, IWebHostEnvironment",
+      "acoes": [
+        {
+          "metodo": "GET Login",
+          "comportamento": "Redireciona para Home se ja logado; exibe formulario de login com returnUrl opcional"
+        },
+        {
+          "metodo": "POST Login",
+          "descricao": "Valida LoginViewModel com antiforgery, chama PasswordSignInAsync, redireciona para returnUrl ou Home"
+        },
+        {
+          "metodo": "GET Register",
+          "comportamento": "Redireciona para Home se ja logado; exibe formulario de cadastro"
+        },
+        {
+          "metodo": "POST Register",
+          "descricao": "Cria Usuario com UserName=Email, EmailConfirmed=true, adiciona role 'User', faz login automatico e redireciona para Home"
+        },
+        {
+          "metodo": "POST Logout",
+          "autorizacao": "[Authorize]",
+          "descricao": "SignOutAsync e redireciona para Home"
+        },
+        {
+          "metodo": "GET Perfil",
+          "autorizacao": "[Authorize]",
+          "descricao": "Exibe dados do usuario logado via PerfilViewModel"
+        },
+        {
+          "metodo": "GET EditarPerfil",
+          "autorizacao": "[Authorize]",
+          "descricao": "Exibe formulario preenchido com NomeCompleto, Bio, FotoAtual"
+        },
+        {
+          "metodo": "POST EditarPerfil",
+          "autorizacao": "[Authorize]",
+          "descricao": "Valida e salva NomeCompleto, Bio, e opcionalmente foto (validacao de extensao e tamanho max 2MB). Converte IFormFile para byte[] via MemoryStream e armazena no banco"
+        }
+      ],
+      "metodo_privado": {
+        "GetCurrentUserAsync": "Retorna Usuario logado via UserManager.GetUserAsync(User)",
+        "ValidatePhotoFile": "Valida extensao (.jpg, .png, .gif, .jpeg, .webp) e tamanho (max 2MB) do arquivo de foto"
+      }
+    },
+    {
+      "nome": "UsuarioController",
+      "arquivo": "Controllers/UsuarioController.cs",
+      "rota": "/User/{action}/{id?}",
+      "autorizacao": "[Authorize] (qualquer usuario logado)",
+      "injeta": "UserManager<Usuario>",
+      "acoes": [
+        {
+          "metodo": "GET Index",
+          "comportamento": "Exibe a area do usuario logado com seus dados (NomeCompleto, Email, Bio, FotoPerfil)"
+        }
+      ]
+    },
+    {
+      "nome": "AdminController",
+      "arquivo": "Controllers/AdminController.cs",
+      "rota": "/Admin/{action}/{id?}",
+      "autorizacao": "[Authorize(Roles = \"Admin\")] (apenas admin)",
+      "injeta": "UserManager<Usuario>, RoleManager<IdentityRole>",
+      "acoes": [
+        {
+          "metodo": "GET Index",
+          "comportamento": "Dashboard: exibe total de usuarios, admins e usuarios comuns via ViewBag"
+        },
+        {
+          "metodo": "GET Usuarios",
+          "comportamento": "Lista todos os usuarios com suas roles em uma tabela, permite promover/rebaixar"
+        },
+        {
+          "metodo": "POST PromoverAdmin",
+          "comportamento": "Recebe userId, remove role User e adiciona role Admin. Exibe TempData de sucesso/aviso"
+        },
+        {
+          "metodo": "POST RebaixarUser",
+          "comportamento": "Recebe userId, remove role Admin e adiciona role User. Impede auto-rebaixamento"
+        }
+      ]
+    }
+  ],
+  "data_layer": {
+    "AppDbContext": {
+      "arquivo": "Data/AppDbContext.cs",
+      "herda": "IdentityDbContext<Usuario>",
+      "construtor": "Recebe DbContextOptions, passa para base",
+      "on_model_creating": "Chama base.OnModelCreating (configuracao padrao do Identity)"
+    },
+    "AppDbSeed": {
+      "arquivo": "Data/AppDbSeed.cs",
+      "metodos": [
+        {
+          "nome": "InicializarAsync(IServiceProvider)",
+          "descricao": "Metodo principal usado no startup. Obtem RoleManager e UserManager via DI e chama SeedRolesEUsuarios"
+        },
+        {
+          "nome": "InicializarComContextoAsync(AppDbContext)",
+          "descricao": "Metodo alternativo para seed em bancos adicionais, cria RoleManager e UserManager manualmente com stores"
+        },
+        {
+          "nome": "SeedRolesEUsuarios(RoleManager, UserManager)",
+          "descricao": "Cria roles 'Admin' e 'User' se nao existirem. Cria usuario admin e usuario padrao"
+        },
+        {
+          "nome": "CriarUsuarioSeNaoExistir(UserManager, email, senha, nome, bio, role)",
+          "descricao": "Verifica se email ja existe, senao cria usuario com EmailConfirmed=true e adiciona na role especificada"
+        }
+      ],
+      "usuarios_semeados": [
+        { "email": "admin@sis.com", "senha": "Admin@123", "nome": "Admin do sistema guys", "role": "Admin" },
+        { "email": "usuario@sis.com", "senha": "Usuario@123", "nome": "usuario do sistema guys", "role": "User" }
+      ]
+    }
+  },
+  "migrations": {
+    "arquivo": "Migrations/20260507155245_InitialCreate.cs",
+    "descricao": "Migration inicial que cria todas as tabelas do Identity (AspNetRoles, AspNetUsers, AspNetRoleClaims, AspNetUserClaims, AspNetUserLogins, AspNetUserRoles, AspNetUserTokens)",
+    "campos_customizados_em_AspNetUsers": [
+      "NomeCompleto (nvarchar(max), not null)",
+      "FotoPerfil (varbinary(max), nullable)",
+      "DataCadastro (datetime2, not null)",
+      "Bio (nvarchar(max), nullable)"
+    ]
+  },
+  "views": {
+    "layout": {
+      "arquivo": "Views/Shared/_Layout.cshtml",
+      "tema": "Dark (data-bs-theme=\"dark\")",
+      "navbar": "Com links: Inicio, Minha Area (se logado), Administracao (se Admin), dropdown de usuario com perfil/sair, e se nao logado: Entrar/Registrar",
+      "alertas_tempdata": "Sucesso (verde), Erro (vermelho), Aviso (amarelo) baseados em TempData",
+      "footer": "Informa ano atual e 'Projeto de Estudo ASP.NET'"
+    },
+    "views_listadas": [
+      { "view": "Home/Index", "model": "PerfilViewModel?", "descricao": "Landing page para nao-logados com 3 cards (Area Admin, Area Usuario, BD) e botoes Entrar/Registrar. Para logados, mostra card de perfil com foto, informacoes da conta, e cards de acesso (Admin ou User)" },
+      { "view": "Home/Privacy", "model": "nenhum", "descricao": "Pagina de politica de privacidade (template padrao)" },
+      { "view": "Account/Login", "model": "LoginViewModel", "descricao": "Formulario de login com email, senha, checkbox 'lembrar', validacao client-side, link para register" },
+      { "view": "Account/Register", "model": "RegisterViewModel", "descricao": "Formulario de cadastro com nome, email, senha, confirmacao, validacao client-side, link para login" },
+      { "view": "Account/Perfil", "model": "PerfilViewModel", "descricao": "Exibe foto (base64), nome, email, badge de perfil, bio, data de cadastro e botao editar" },
+      { "view": "Account/EditarPerfil", "model": "EditarPerfilViewModel", "descricao": "Formulario com preview de foto (JS), campos nome, bio, upload de imagem com restricoes, validacao client-side" },
+      { "view": "User/Index", "model": "Usuario", "descricao": "Area do usuario logado: foto, nome, email, bio, botoes para perfil e editar" },
+      { "view": "Admin/Index", "model": "nenhum (ViewBag)", "descricao": "Dashboard admin: 3 cards com total usuarios, admins, usuarios comuns e botao gerenciar" },
+      { "view": "Admin/Usuarios", "model": "List<(Usuario, IList<string>)>", "descricao": "Tabela com todos usuarios, colunas nome/email/perfil/data/acoes. Botoes Promover (User->Admin) e Rebaixar (Admin->User)" },
+      { "view": "Shared/Error", "model": "ErrorViewModel", "descricao": "Pagina de erro generica" }
+    ]
+  },
+  "estaticos": {
+    "css_personalizado": "wwwroot/css/site.css (322 linhas) - tema dark completo: fundo #0F0F0F, cor primaria #5DD62C (verde neon), fonte Nunito, cards com borda verde, botoes primarios verdes com hover, tabelas transparentes no admin, scrollbar customizada",
+    "js_personalizado": "wwwroot/js/site.js (apenas template padrao, vazio)",
+    "libs_incluidas": "Bootstrap 5 (css+js), jQuery, jQuery Validation, jQuery Validation Unobtrusive",
+    "libs_cdn": "Bootstrap Icons, Google Fonts Nunito"
+  },
+  "configuracoes_identity": {
+    "senha": {
+      "RequireDigit": true,
+      "RequireLowercase": true,
+      "RequireUppercase": true,
+      "RequireNonAlphanumeric": true,
+      "RequiredLength": 6
+    },
+    "signin": { "RequireConfirmedEmail": false },
+    "cookie": {
+      "LoginPath": "/Account/Login",
+      "LogoutPath": "/Account/Logout",
+      "AccessDeniedPath": "/Account/AcessoNegado",
+      "ExpireTimeSpan": "30 dias",
+      "SlidingExpiration": true
+    }
+  },
+  "rotas": {
+    "default": "{controller=Home}/{action=Index}/{id?}",
+    "mapeamento_controllers": ["HomeController", "AccountController", "UsuarioController", "AdminController"]
+  },
+  "seguranca": {
+    "csrf": "AntiForgeryToken em todos formularios POST",
+    "autorizacao_por_role": "AdminController restrito a role Admin, UsuarioController disponivel a qualquer usuario logado",
+    "validacao_lado_servidor": "DataAnnotations nos ViewModels + ModelState.IsValid",
+    "validacao_cliente": "jQuery Validation Unobtrusive",
+    "protecao_upload": "Validacao de extensao (.jpg,.png,.gif,.jpeg,.webp) e tamanho max 2MB no upload de foto",
+    "redirecionamento_seguro": "Url.IsLocalUrl() no returnUrl do login"
+  },
+  "fluxo_completo_exemplo_registro": {
+    "1": "Usuario acessa /Account/Register",
+    "2": "AccountController.Register GET retorna view com formulario vazio",
+    "3": "Usuario preenche dados e envia POST",
+    "4": "AntiForgeryToken validado, ModelState.IsValid checado",
+    "5": "Novo objeto Usuario criado com UserName=Email, EmailConfirmed=true",
+    "6": "userManager.CreateAsync(usuario, senha) salva no banco (hash da senha)",
+    "7": "userManager.AddToRoleAsync(usuario, 'User') atribui role padrao",
+    "8": "signInManager.SignInAsync(usuario) cria cookie de autenticacao",
+    "9": "Redireciona para Home/Index (logado com PerfilViewModel personalizado)"
+  },
+  "fluxo_completo_exemplo_editar_perfil": {
+    "1": "Usuario logado acessa /Account/EditarPerfil",
+    "2": "Carrega dados atuais (Nome, Bio, Foto) no EditarPerfilViewModel",
+    "3": "View renderiza formulario com preview da foto via base64",
+    "4": "Usuario altera nome, bio e seleciona nova foto (JS faz preview client-side)",
+    "5": "POST envia arquivo via enctype multipart/form-data",
+    "6": "Valida extensao e tamanho da foto",
+    "7": "Converte IFormFile para byte[] via MemoryStream",
+    "8": "userManager.UpdateAsync(usuario) salva alteracoes no banco",
+    "9": "TempData['Sucesso'] definido, redireciona para Perfil"
+  },
+  "fluxo_completo_exemplo_admin_promover": {
+    "1": "Admin acessa /Admin/Usuarios, ve tabela com todos usuarios",
+    "2": "Clica 'Promover' em um usuario comum",
+    "3": "POST /Admin/PromoverAdmin com userId no corpo",
+    "4": "AdminController busca usuario por ID, verifica se ja nao eh Admin",
+    "5": "Remove role 'User', adiciona role 'Admin'",
+    "6": "TempData['Sucesso'] e redirect de volta para lista"
+  },
+  "observacoes_tecnicas": {
+    "foto_como_byte_array": "Fotos sao armazenadas como byte[] no banco (varbinary(max)) e renderizadas nas views como data URIs base64: 'data:image;base64,@base64'",
+    "metodo_seed_alternativo": "AppDbSeed.InicializarComContextoAsync existe para cenarios onde DI nao esta disponivel (bancos adicionais), criando manualmente as stores do Identity",
+    "namespace_controllers": "Todos os controllers usam o namespace 'SysPost.Controllers'",
+    "views_com_tipos_complexos": "Admin/Usuarios usa uma ValueTuple List<(Usuario, IList<string>)> como modelo diretamente na view",
+    "uso_de_ViewBag": "Admin/Index passa estatisticas via ViewBag (TotalUsuarios, TotalAdmins, TotalUsers)",
+    "tempdata_tipos": "Sucesso (alert-success), Erro (alert-danger), Aviso (alert-warning) - tratados no layout globalmente"
+  }
+}

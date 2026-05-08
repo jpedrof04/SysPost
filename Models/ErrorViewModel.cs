@@ -1,4 +1,4 @@
-namespace learnfds.Models;
+namespace SysPost.Models;
 
 public class ErrorViewModel
 {

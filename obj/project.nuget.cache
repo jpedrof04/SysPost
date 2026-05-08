@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xBdNpPVzR3s=",
+  "dgSpecHash": "um4LS0b4FNU=",
   "success": true,
-  "projectFilePath": "C:\\Users\\alunobcc09\\Desktop\\MY-WS\\mvc\\learnfds\\learnfds.csproj",
+  "projectFilePath": "C:\\Users\\alunobcc09\\Desktop\\MY-WS\\mvc\\SysPost\\SysPost.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\alunobcc09\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\alunobcc09\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

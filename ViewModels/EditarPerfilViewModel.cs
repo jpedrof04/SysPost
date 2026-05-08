@@ -2,7 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace learnfds.ViewModels
+namespace SysPost.ViewModels
 {
 
     //EDITAR PERFIL!!

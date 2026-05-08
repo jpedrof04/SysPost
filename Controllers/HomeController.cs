@@ -1,9 +1,9 @@
-using learnfds.Models;
-using learnfds.ViewModels;
+using SysPost.Models;
+using SysPost.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace learnfds.Controllers
+namespace SysPost.Controllers
 {
     /// <summary>
     /// Página inicial da aplicação.

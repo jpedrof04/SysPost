@@ -1,9 +1,9 @@
-using learnfds.Models;
+using SysPost.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace fds.Controllers
+namespace SysPost.Controllers
 {
     /// <summary>
     /// Área administrativa — acessível somente por usuários com a role "Admin".

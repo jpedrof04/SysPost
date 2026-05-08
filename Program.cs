@@ -1,5 +1,5 @@
-using learnfds.Data;
-using learnfds.Models;
+using SysPost.Data;
+using SysPost.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;

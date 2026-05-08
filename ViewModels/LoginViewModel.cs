@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace learnfds.ViewModels
+namespace SysPost.ViewModels
 {
     //LOGIN 
     //dados enviados pelo formulario de login

@@ -1,4 +1,4 @@
-@model learnfds.ViewModels.LoginViewModel
+@model SysPost.ViewModels.LoginViewModel
 @{
     ViewData["Title"] = "Entrar";
     string? returnUrl = ViewData["ReturnUrl"] as string;
@@ -45,7 +45,7 @@
                         <label asp-for="LembrarMe" class="form-check-label"></label>
                     </div>
 
-                    <button type="submit" class="btn btn-warning w-100 mb-3">
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
                     </button>
 

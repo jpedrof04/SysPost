@@ -1,7 +1,7 @@
 
 using Microsoft.AspNetCore.Identity;
 
-namespace learnfds.Models
+namespace SysPost.Models
 {
     public class Usuario : IdentityUser
     {
