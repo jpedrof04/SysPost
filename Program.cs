@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao")));
+options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoSecundaria")));
 
 builder.Services.AddIdentity<Usuario, IdentityRole>(options =>
 {

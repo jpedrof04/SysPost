@@ -4,7 +4,7 @@
     bool logado = User.Identity?.IsAuthenticated == true;
 }
 
-@if (!logado)
+@if (!logado || Model == null)
 {
     <!-- ══════════ HOME PÚBLICA (visitante) ══════════ -->
     <div class="text-center py-5">
@@ -79,8 +79,7 @@ else
                 @if (Model.FotoPerfil != null && Model.FotoPerfil.Length > 0)
                 {
                     var base64 = Convert.ToBase64String(Model.FotoPerfil);
-                    <img src="data:image;base64,@base64" alt="Foto de perfil"
-                         class="rounded-circle mx-auto d-block mb-3"
+                    <img src="data:image;base64,@base64" alt="Foto de perfil" class="rounded-circle mx-auto d-block mb-3"
                          style="width:110px;height:110px;object-fit:cover;border:3px solid #dee2e6;" />
                 }
                 else

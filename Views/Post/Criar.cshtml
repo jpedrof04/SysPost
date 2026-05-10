@@ -1,0 +1,36 @@
+@model SysPost.ViewModels.CriarPostViewModel
+
+<form method="post" enctype="multipart/form-data">
+
+    <div class="mb-3">
+        <label>Título</label>
+        <input asp-for="Titulo" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Descrição</label>
+        <textarea asp-for="Descricao"
+                  class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>Tópico</label>
+
+        <select asp-for="Topico"
+                class="form-select"
+                asp-items="Html.GetEnumSelectList<SysPost.Models.TopicoPost>()">
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Imagem</label>
+        <input asp-for="ImagemArquivo"
+               type="file"
+               class="form-control" />
+    </div>
+
+    <button class="btn btn-success">
+        Publicar
+    </button>
+
+</form>

@@ -13,5 +13,7 @@ namespace SysPost.Data
         {
             base.OnModelCreating(builder);
         }
+
+        public DbSet<Post> Posts { get; set; }
     }
 }

@@ -2,6 +2,8 @@ using SysPost.Models;
 using SysPost.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SysPost.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SysPost.Controllers
 {
@@ -12,10 +14,12 @@ namespace SysPost.Controllers
     public class HomeController : Controller
     {
         private readonly UserManager<Usuario> _userManager;
+        private readonly AppDbContext _context;
 
-        public HomeController(UserManager<Usuario> userManager)
+        public HomeController(UserManager<Usuario> userManager, AppDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
@@ -39,6 +43,13 @@ namespace SysPost.Controllers
                 DataCadastro = usuario.DataCadastro,
                 Perfil = roles.FirstOrDefault() ?? "User"
             };
+
+            var posts = await _context.Posts
+            .Include(p => p.Usuario)
+            .OrderByDescending(p => p.DataCriacao)
+            .ToListAsync();
+
+            ViewBag.Posts = posts;
 
             return View(vm);
         }
