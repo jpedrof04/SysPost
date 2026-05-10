@@ -2,6 +2,8 @@ using SysPost.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SysPost.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SysPost.Controllers
 {
@@ -15,12 +17,16 @@ namespace SysPost.Controllers
         private readonly UserManager<Usuario> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
+        private readonly AppDbContext _context;
+
         public AdminController(
             UserManager<Usuario> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            AppDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
         }
 
         // ─── DASHBOARD ────────────────────────────────────────────────────────
@@ -109,6 +115,40 @@ namespace SysPost.Controllers
             }
 
             return RedirectToAction("Usuarios");
+        }
+
+
+        // ─── POSTS DE TODOS OS USUÁRIOS ───────────────────────────────────────
+
+        public async Task<IActionResult> Posts()
+        {
+            var posts = await _context.Posts
+                .Include(p => p.Usuario)
+                .OrderByDescending(p => p.DataCriacao)
+                .ToListAsync();
+
+            return View(posts);
+        }
+
+        // ─── EXCLUIR POST ─────────────────────────────────────────────────────
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExcluirPost(int id)
+        {
+            var post = await _context.Posts.FindAsync(id);
+
+            if (post == null)
+            {
+                TempData["Erro"] = "Post não encontrado.";
+                return RedirectToAction("Posts");
+            }
+
+            _context.Posts.Remove(post);
+            await _context.SaveChangesAsync();
+
+            TempData["Sucesso"] = "Post removido com sucesso.";
+            return RedirectToAction("Posts");
         }
     }
 }

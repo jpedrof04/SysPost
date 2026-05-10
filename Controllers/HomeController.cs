@@ -22,15 +22,36 @@ namespace SysPost.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+
+        public async Task<IActionResult> Index(string? usuarioNome, TopicoPost? topico)
         {
-            // Se não está logado, exibe a home pública
+            var query = _context.Posts
+                .Include(p => p.Usuario)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(usuarioNome))
+                query = query.Where(p => p.Usuario.NomeCompleto.Contains(usuarioNome));
+
+            if (topico.HasValue)
+                query = query.Where(p => p.Topico == topico.Value);
+
+            var posts = await query
+                .OrderByDescending(p => p.DataCriacao)
+                .ToListAsync();
+
+            ViewBag.Posts = posts;
+            ViewBag.FiltroUsuarioNome = usuarioNome;
+            ViewBag.FiltroTopico = topico;
+
+            // VISITANTE
             if (User.Identity?.IsAuthenticated != true)
                 return View();
 
-            // Se está logado, busca dados do usuário e passa para a view
+            // USUÁRIO LOGADO
             var usuario = await _userManager.GetUserAsync(User);
-            if (usuario == null) return View();
+
+            if (usuario == null)
+                return View();
 
             var roles = await _userManager.GetRolesAsync(usuario);
 
@@ -43,13 +64,6 @@ namespace SysPost.Controllers
                 DataCadastro = usuario.DataCadastro,
                 Perfil = roles.FirstOrDefault() ?? "User"
             };
-
-            var posts = await _context.Posts
-            .Include(p => p.Usuario)
-            .OrderByDescending(p => p.DataCriacao)
-            .ToListAsync();
-
-            ViewBag.Posts = posts;
 
             return View(vm);
         }

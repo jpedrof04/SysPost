@@ -16,6 +16,6 @@ namespace SysPost.ViewModels
         [Required]
         public TopicoPost Topico { get; set; }
 
-        public IFormFile? ImagemArquivo { get; set; }
+        public IFormFile? Imagem { get; set; }
     }
 }

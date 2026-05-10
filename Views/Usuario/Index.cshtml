@@ -1,0 +1,148 @@
+@model SysPost.ViewModels.PerfilViewModel
+@{
+    ViewData["Title"] = "Minha Área";
+    var exibirForm = ViewBag.ExibirForm ?? false;
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8 col-lg-6">
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body text-center p-4">
+
+                @if (Model.FotoPerfil != null && Model.FotoPerfil.Length > 0)
+                {
+                    var base64 = Convert.ToBase64String(Model.FotoPerfil);
+                    <img src="data:image;base64,@base64"
+                         class="rounded-circle mb-3"
+                         style="width:120px;height:120px;object-fit:cover;"
+                         alt="Foto de perfil" />
+                }
+                else
+                {
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width:120px;height:120px;">
+                        <i class="bi bi-person-fill text-white" style="font-size:3rem;"></i>
+                    </div>
+                }
+
+                <h4 class="fw-bold mb-1">@Model.NomeCompleto</h4>
+                <p class="text-muted mb-1"><i class="bi bi-envelope me-1"></i>@Model.Email</p>
+
+                <span class="badge @(Model.Perfil == "Admin" ? "bg-primary" : "bg-success") mb-3">
+                    @Model.Perfil
+                </span>
+
+                @if (!string.IsNullOrEmpty(Model.Bio))
+                {
+                    <p class="text-muted">@Model.Bio</p>
+                }
+
+                <p class="text-muted small">
+                    <i class="bi bi-calendar me-1"></i>
+                    Membro desde @Model.DataCadastro.ToString("dd/MM/yyyy")
+                </p>
+
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <button class="btn btn-primary" onclick="toggleEdit()">
+                        <i class="bi bi-pencil me-1"></i>Editar Perfil
+                    </button>
+
+                    @if (Model.Perfil == "Admin")
+                    {
+                        <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-warning fw-bold">
+                            <i class="bi bi-shield-lock me-1"></i>Administração
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div id="editCard" class="card shadow-sm border-0" style="display:@(exibirForm ? "block" : "none")">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Editar Perfil</h5>
+            </div>
+            <div class="card-body p-4">
+
+                <div class="text-center mb-4">
+                    @if (Model.FotoPerfil != null && Model.FotoPerfil.Length > 0)
+                    {
+                        var base64 = Convert.ToBase64String(Model.FotoPerfil);
+                        <img src="data:image;base64,@base64"
+                             id="preview"
+                             class="rounded-circle mb-2"
+                             style="width:100px;height:100px;object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <div id="preview-placeholder"
+                             class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-2"
+                             style="width:100px;height:100px;">
+                            <i class="bi bi-person-fill text-white" style="font-size:2.5rem;"></i>
+                        </div>
+                    }
+                </div>
+
+                <form asp-action="EditarPerfil" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label">Nome completo</label>
+                        <input name="NomeCompleto" class="form-control" value="@Model.NomeCompleto" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Bio</label>
+                        <textarea name="Bio" class="form-control" rows="3">@Model.Bio</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Foto de perfil</label>
+                        <input name="FotoArquivo" class="form-control" type="file"
+                               accept="image/*" onchange="previewFoto(this)" />
+                        <div class="form-text">Máximo 2MB. Formatos: JPG, PNG, GIF, WEBP.</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Salvar
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="toggleEdit()">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleEdit() {
+            const card = document.getElementById('editCard');
+            card.style.display = card.style.display === 'none' ? 'block' : 'none';
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function previewFoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    let img = document.getElementById('preview');
+                    const placeholder = document.getElementById('preview-placeholder');
+                    if (!img) {
+                        img = document.createElement('img');
+                        img.id = 'preview';
+                        img.className = 'rounded-circle mb-2';
+                        img.style = 'width:100px;height:100px;object-fit:cover;display:block;margin:auto;';
+                        if (placeholder) placeholder.replaceWith(img);
+                    }
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

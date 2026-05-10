@@ -1,91 +1,168 @@
-using SysPost.Data;
-using SysPost.Models;
-using SysPost.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SysPost.Data;
+using SysPost.Models;
+using SysPost.ViewModels;
 
-namespace SysPost.Controllers
+namespace SysPost.Controllers;
+
+[Authorize]
+public class PostController : Controller
 {
-    [Authorize]
-    public class PostController : Controller
+    private readonly AppDbContext _context;
+    private readonly UserManager<Usuario> _userManager;
+
+    public PostController(
+        AppDbContext context,
+        UserManager<Usuario> userManager)
     {
-        private readonly AppDbContext _context;
-        private readonly UserManager<Usuario> _userManager;
+        _context = context;
+        _userManager = userManager;
+    }
 
-        public PostController(
-            AppDbContext context,
-            UserManager<Usuario> userManager)
+    // =========================
+    // MEUS POSTS
+    // =========================
+    public async Task<IActionResult> MeusPosts()
+    {
+        var usuario = await _userManager.GetUserAsync(User);
+
+        var posts = await _context.Posts
+            .Where(p => p.UsuarioId == usuario!.Id)
+            .OrderByDescending(p => p.DataCriacao)
+            .ToListAsync();
+
+        return View(posts);
+    }
+
+    // =========================
+    // CRIAR POST
+    // =========================
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View("Criar");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(CriarPostViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var usuario = await _userManager.GetUserAsync(User);
+
+        byte[]? imagemBytes = null;
+
+        if (model.Imagem != null)
         {
-            _context = context;
-            _userManager = userManager;
+            using var ms = new MemoryStream();
+
+            await model.Imagem.CopyToAsync(ms);
+
+            imagemBytes = ms.ToArray();
         }
 
-        [HttpGet]
-        public IActionResult Criar()
+        var post = new Post
         {
-            return View();
-        }
+            Titulo = model.Titulo,
+            Descricao = model.Descricao,
+            Topico = model.Topico,
+            Imagem = imagemBytes,
+            UsuarioId = usuario!.Id,
+            DataCriacao = DateTime.Now
+        };
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Criar(CriarPostViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
+        _context.Posts.Add(post);
 
-            var usuario = await _userManager.GetUserAsync(User);
+        await _context.SaveChangesAsync();
 
-            if (usuario == null)
-                return RedirectToAction("Login", "Account");
+        TempData["Sucesso"] = "Post criado com sucesso!";
 
-            byte[]? imagemBytes = null;
+        return RedirectToAction(nameof(MeusPosts));
+    }
 
-            if (model.ImagemArquivo != null)
-            {
-                var extensoesPermitidas = new[]
-                {
-                    ".jpg", ".jpeg", ".png", ".webp"
-                };
+    // =========================
+    // EDITAR
+    // =========================
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var usuario = await _userManager.GetUserAsync(User);
 
-                var extensao = Path.GetExtension(model.ImagemArquivo.FileName).ToLower();
+        var post = await _context.Posts
+            .FirstOrDefaultAsync(p =>
+                p.Id == id &&
+                p.UsuarioId == usuario!.Id);
 
-                if (!extensoesPermitidas.Contains(extensao))
-                {
-                    ModelState.AddModelError("", "Imagem inválida.");
-                    return View(model);
-                }
+        if (post == null)
+            return NotFound();
 
-                if (model.ImagemArquivo.Length > 2 * 1024 * 1024)
-                {
-                    ModelState.AddModelError("", "Máximo 2MB.");
-                    return View(model);
-                }
+        return View(post);
+    }
 
-                using var ms = new MemoryStream();
+    // =========================
+    // EXCLUIR
+    // =========================
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var usuario = await _userManager.GetUserAsync(User);
 
-                await model.ImagemArquivo.CopyToAsync(ms);
+        var post = await _context.Posts
+            .FirstOrDefaultAsync(p =>
+                p.Id == id &&
+                p.UsuarioId == usuario!.Id);
 
-                imagemBytes = ms.ToArray();
-            }
+        if (post == null)
+            return NotFound();
 
-            var post = new Post
-            {
-                Titulo = model.Titulo,
-                Descricao = model.Descricao,
-                Topico = model.Topico,
-                Imagem = imagemBytes,
-                UsuarioId = usuario.Id
-            };
+        _context.Posts.Remove(post);
 
-            _context.Posts.Add(post);
+        await _context.SaveChangesAsync();
 
-            await _context.SaveChangesAsync();
+        TempData["Sucesso"] = "Post removido.";
 
-            TempData["Sucesso"] = "Post criado!";
+        return RedirectToAction(nameof(MeusPosts));
+    }
 
-            return RedirectToAction("Index", "Home");
-        }
+    // =========================
+    // ADMIN - TODOS POSTS
+    // =========================
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Todos()
+    {
+        var posts = await _context.Posts
+            .Include(p => p.Usuario)
+            .OrderByDescending(p => p.DataCriacao)
+            .ToListAsync();
+
+        return View(posts);
+    }
+
+    // =========================
+    // ADMIN APAGA QUALQUER POST
+    // =========================
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteAdmin(int id)
+    {
+        var post = await _context.Posts.FindAsync(id);
+
+        if (post == null)
+            return NotFound();
+
+        _context.Posts.Remove(post);
+
+        await _context.SaveChangesAsync();
+
+        TempData["Sucesso"] = "Post apagado pelo admin.";
+
+        return RedirectToAction(nameof(Todos));
     }
 }
