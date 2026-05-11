@@ -1,0 +1,38 @@
+@model SysPost.ViewModels.EditarPostViewModel
+
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label>Título</label>
+        <input asp-for="Titulo" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Descrição</label>
+        <textarea asp-for="Descricao" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>Tópico</label>
+        <select asp-for="Topico"
+                class="form-select"
+                asp-items="Html.GetEnumSelectList<SysPost.Models.TopicoPost>()">
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Imagem</label>
+        @if (Model.ImagemAtual != null)
+        {
+            <div class="mb-2">
+                <img src="data:image;base64,@Convert.ToBase64String(Model.ImagemAtual)"
+                     class="img-thumbnail" style="max-height:200px" />
+            </div>
+        }
+        <input asp-for="Imagem" type="file" class="form-control" />
+    </div>
+
+    <button class="btn btn-success">Salvar</button>
+    <a asp-action="MeusPosts" class="btn btn-secondary">Cancelar</a>
+</form>
