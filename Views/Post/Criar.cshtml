@@ -2,24 +2,29 @@
 
 <form method="post" enctype="multipart/form-data">
 
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
     <div class="mb-3">
         <label>Título</label>
         <input asp-for="Titulo" class="form-control" />
+        <span asp-validation-for="Titulo" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label>Descrição</label>
         <textarea asp-for="Descricao"
                   class="form-control"></textarea>
+        <span asp-validation-for="Descricao" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label>Tópico</label>
-
         <select asp-for="Topico"
                 class="form-select"
                 asp-items="Html.GetEnumSelectList<SysPost.Models.TopicoPost>()">
+            <option value="">Selecione um tópico</option>
         </select>
+        <span asp-validation-for="Topico" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
@@ -27,6 +32,7 @@
         <input asp-for="Imagem"
                type="file"
                class="form-control" />
+        <span asp-validation-for="Imagem" class="text-danger"></span>
     </div>
 
     <button class="btn btn-success">
@@ -34,3 +40,7 @@
     </button>
 
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

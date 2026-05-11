@@ -51,7 +51,7 @@ public class PostController : Controller
     public async Task<IActionResult> Create(CriarPostViewModel model)
     {
         if (!ModelState.IsValid)
-            return View(model);
+            return View("Criar", model);
 
         var usuario = await _userManager.GetUserAsync(User);
 
