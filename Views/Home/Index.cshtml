@@ -23,6 +23,23 @@
     }
 </div>
 
+@{
+    var dbQueries = ViewBag.DbQueries as int?;
+    var dbTimeMs = ViewBag.DbTimeMs as double?;
+    var dbLastMs = ViewBag.DbLastMs as double?;
+}
+
+@if (dbQueries.HasValue && dbQueries > 0)
+{
+    <div class="card border-secondary bg-transparent mb-3">
+        <div class="card-body py-2 px-3 d-flex gap-4 flex-wrap small text-muted">
+            <span><i class="bi bi-database me-1"></i>Consultas: <strong>@dbQueries</strong></span>
+            <span><i class="bi bi-clock me-1"></i>Total: <strong>@dbTimeMs?.ToString("F2") ms</strong></span>
+            <span><i class="bi bi-activity me-1"></i>Última: <strong>@dbLastMs?.ToString("F2") ms</strong></span>
+        </div>
+    </div>
+}
+
 <div class="card p-3 mb-4">
     <form method="get" action="/" class="row g-2 align-items-end">
         <div class="col-md-5">

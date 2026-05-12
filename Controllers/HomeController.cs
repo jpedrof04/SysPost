@@ -1,5 +1,6 @@
 using SysPost.Models;
 using SysPost.ViewModels;
+using SysPost.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SysPost.Data;
@@ -7,19 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SysPost.Controllers
 {
-    /// <summary>
-    /// Página inicial da aplicação.
-    /// Se o usuário estiver logado, exibe informações personalizadas por perfil.
-    /// </summary>
     public class HomeController : Controller
     {
         private readonly UserManager<Usuario> _userManager;
         private readonly AppDbContext _context;
+        private readonly QueryMonitor _monitor;
 
-        public HomeController(UserManager<Usuario> userManager, AppDbContext context)
+        public HomeController(UserManager<Usuario> userManager, AppDbContext context, QueryMonitor monitor)
         {
             _userManager = userManager;
             _context = context;
+            _monitor = monitor;
         }
 
 
@@ -45,13 +44,23 @@ namespace SysPost.Controllers
 
             // VISITANTE
             if (User.Identity?.IsAuthenticated != true)
+            {
+                ViewBag.DbQueries = _monitor.QueryCount;
+                ViewBag.DbTimeMs = Math.Round(_monitor.TotalTimeMs, 2);
+                ViewBag.DbLastMs = Math.Round(_monitor.LastQueryMs, 2);
                 return View();
+            }
 
             // USUÁRIO LOGADO
             var usuario = await _userManager.GetUserAsync(User);
 
             if (usuario == null)
+            {
+                ViewBag.DbQueries = _monitor.QueryCount;
+                ViewBag.DbTimeMs = Math.Round(_monitor.TotalTimeMs, 2);
+                ViewBag.DbLastMs = Math.Round(_monitor.LastQueryMs, 2);
                 return View();
+            }
 
             var roles = await _userManager.GetRolesAsync(usuario);
 
@@ -64,6 +73,10 @@ namespace SysPost.Controllers
                 DataCadastro = usuario.DataCadastro,
                 Perfil = roles.FirstOrDefault() ?? "User"
             };
+
+            ViewBag.DbQueries = _monitor.QueryCount;
+            ViewBag.DbTimeMs = Math.Round(_monitor.TotalTimeMs, 2);
+            ViewBag.DbLastMs = Math.Round(_monitor.LastQueryMs, 2);
 
             return View(vm);
         }

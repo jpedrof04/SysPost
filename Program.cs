@@ -1,13 +1,20 @@
 using SysPost.Data;
 using SysPost.Models;
+using SysPost.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao")));
+builder.Services.AddScoped<QueryMonitor>();
+builder.Services.AddScoped<QueryMonitorInterceptor>();
+
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao"));
+    options.AddInterceptors(sp.GetRequiredService<QueryMonitorInterceptor>());
+});
 
 builder.Services.AddIdentity<Usuario, IdentityRole>(options =>
 {
