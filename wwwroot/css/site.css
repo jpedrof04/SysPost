@@ -320,3 +320,12 @@ small, .small {
 .admin-page .table > :not(caption) > * > * {
   border-bottom: 1px solid rgba(93, 214, 44, 0.15);
 }
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(93, 214, 44, 0.15);
+}

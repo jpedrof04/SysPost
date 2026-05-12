@@ -15,12 +15,20 @@ namespace SysPost.Models
         [StringLength(500)]
         public string Descricao { get; set; } = string.Empty;
 
+        [StringLength(5000)]
+        public string? Detalhamento { get; set; }
+
+        [StringLength(2000)]
+        public string? InformacaoEspecial { get; set; }
+
         [Required]
         public TopicoPost Topico { get; set; }
 
         public byte[]? Imagem { get; set; }
 
         public DateTime DataCriacao { get; set; } = DateTime.Now;
+
+        public ICollection<Comment> Comentarios { get; set; } = new List<Comment>();
 
         // FK usuário
         [Required]

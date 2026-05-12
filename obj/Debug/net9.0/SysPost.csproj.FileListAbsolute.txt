@@ -634,7 +634,6 @@ C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\rjsmcshtml.dswa.cache
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\scopedcss\bundle\SysPost.styles.css
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\scopedcss\projectbundle\SysPost.bundle.scp.css
-C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\dzl11qtb08-ntco8x7y8j.gz
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\n187m2eri8-61n19gt1b8.gz
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\j0hgdugvgf-xtxxf3hu2r.gz
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\acka2vj8hu-t1cqhe9u97.gz
@@ -708,3 +707,4 @@ C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\refint\SysPost.dll
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\SysPost.pdb
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\SysPost.genruntimeconfig.cache
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\ref\SysPost.dll
+C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\dzl11qtb08-ombnpv0ese.gz

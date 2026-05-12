@@ -19,6 +19,18 @@
     </div>
 
     <div class="mb-3">
+        <label>Detalhamento</label>
+        <textarea asp-for="Detalhamento" class="form-control" rows="5"></textarea>
+        <span asp-validation-for="Detalhamento" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Informação Especial (códigos, tópicos especiais)</label>
+        <textarea asp-for="InformacaoEspecial" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="InformacaoEspecial" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
         <label>Tópico</label>
         <select asp-for="Topico"
                 class="form-select"

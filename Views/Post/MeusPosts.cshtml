@@ -19,25 +19,30 @@
         @foreach (var post in Model)
         {
             <div class="col-md-6 col-lg-4">
+
                 <div class="card h-100 shadow-sm border-0">
 
-                    @if (post.Imagem != null)
-                    {
-                        var base64 = Convert.ToBase64String(post.Imagem);
-                        <img src="data:image/png;base64,@base64"
-                             class="card-img-top"
-                             style="height:200px;object-fit:cover;" />
-                    }
+                    <a asp-action="Detalhes" asp-route-id="@post.Id" class="text-decoration-none text-white">
 
-                    <div class="card-body">
-                        <span class="badge bg-success mb-2">@post.Topico</span>
-                        <h5 class="fw-bold">@post.Titulo</h5>
-                        <p class="text-muted">@post.Descricao</p>
-                        <small class="text-muted">
-                            <i class="bi bi-clock me-1"></i>
-                            @post.DataCriacao.ToString("dd/MM/yyyy HH:mm")
-                        </small>
-                    </div>
+                        @if (post.Imagem != null)
+                        {
+                            var base64 = Convert.ToBase64String(post.Imagem);
+                            <img src="data:image/png;base64,@base64"
+                                 class="card-img-top"
+                                 style="height:200px;object-fit:cover;" />
+                        }
+
+                        <div class="card-body">
+                            <span class="badge bg-success mb-2">@post.Topico</span>
+                            <h5 class="fw-bold text-white">@post.Titulo</h5>
+                            <p class="text-muted">@post.Descricao</p>
+                            <small class="text-muted">
+                                <i class="bi bi-clock me-1"></i>
+                                @post.DataCriacao.ToString("dd/MM/yyyy HH:mm")
+                            </small>
+                        </div>
+
+                    </a>
 
                     <div class="card-footer bg-transparent border-0 d-flex gap-2">
                         <a asp-action="Edit" asp-route-id="@post.Id" class="btn btn-outline-primary btn-sm">

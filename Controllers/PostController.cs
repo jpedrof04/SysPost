@@ -23,6 +23,86 @@ public class PostController : Controller
     }
 
     // =========================
+    // DETALHES DO POST
+    // =========================
+    [AllowAnonymous]
+    public async Task<IActionResult> Detalhes(int id)
+    {
+        var post = await _context.Posts
+            .Include(p => p.Usuario)
+            .Include(p => p.Comentarios)
+                .ThenInclude(c => c.Usuario)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (post == null)
+            return NotFound();
+
+        var comentarios = post.Comentarios
+            .OrderByDescending(c => c.DataCriacao)
+            .Take(6)
+            .ToList();
+
+        var vm = new PostDetalhesViewModel
+        {
+            Post = post,
+            Comentarios = comentarios
+        };
+
+        return View(vm);
+    }
+
+    // =========================
+    // COMENTAR
+    // =========================
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Comentar(int postId, PostDetalhesViewModel model)
+    {
+        if (string.IsNullOrWhiteSpace(model.NovoComentario))
+        {
+            TempData["Erro"] = "O comentário não pode estar vazio.";
+            return RedirectToAction(nameof(Detalhes), new { id = postId });
+        }
+
+        if (model.NovoComentario.Length > 500)
+        {
+            TempData["Erro"] = "O comentário deve ter no máximo 500 caracteres.";
+            return RedirectToAction(nameof(Detalhes), new { id = postId });
+        }
+
+        var post = await _context.Posts
+            .Include(p => p.Comentarios)
+            .FirstOrDefaultAsync(p => p.Id == postId);
+
+        if (post == null)
+            return NotFound();
+
+        var qtdComentarios = post.Comentarios.Count;
+
+        if (qtdComentarios >= 6)
+        {
+            TempData["Erro"] = "Este post já atingiu o limite máximo de 6 comentários.";
+            return RedirectToAction(nameof(Detalhes), new { id = postId });
+        }
+
+        var usuario = await _userManager.GetUserAsync(User);
+
+        var comment = new Comment
+        {
+            Conteudo = model.NovoComentario.Trim(),
+            PostId = postId,
+            UsuarioId = usuario!.Id,
+            DataCriacao = DateTime.Now
+        };
+
+        _context.Comments.Add(comment);
+        await _context.SaveChangesAsync();
+
+        TempData["Sucesso"] = "Comentário adicionado!";
+        return RedirectToAction(nameof(Detalhes), new { id = postId });
+    }
+
+    // =========================
     // MEUS POSTS
     // =========================
     public async Task<IActionResult> MeusPosts()
@@ -70,6 +150,8 @@ public class PostController : Controller
         {
             Titulo = model.Titulo,
             Descricao = model.Descricao,
+            Detalhamento = model.Detalhamento,
+            InformacaoEspecial = model.InformacaoEspecial,
             Topico = model.Topico,
             Imagem = imagemBytes,
             UsuarioId = usuario!.Id,
@@ -106,6 +188,8 @@ public class PostController : Controller
             Id = post.Id,
             Titulo = post.Titulo,
             Descricao = post.Descricao,
+            Detalhamento = post.Detalhamento,
+            InformacaoEspecial = post.InformacaoEspecial,
             Topico = post.Topico,
             ImagemAtual = post.Imagem
         };
@@ -132,6 +216,8 @@ public class PostController : Controller
 
         post.Titulo = model.Titulo;
         post.Descricao = model.Descricao;
+        post.Detalhamento = model.Detalhamento;
+        post.InformacaoEspecial = model.InformacaoEspecial;
         post.Topico = model.Topico;
 
         if (model.Imagem != null)

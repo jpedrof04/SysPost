@@ -16,6 +16,14 @@ namespace SysPost.ViewModels
         [Display(Name = "descrição post")]
         public string Descricao { get; set; } = string.Empty;
 
+        [StringLength(5000)]
+        [Display(Name = "detalhamento post")]
+        public string? Detalhamento { get; set; }
+
+        [StringLength(2000)]
+        [Display(Name = "informação especial")]
+        public string? InformacaoEspecial { get; set; }
+
         [Required]
         public TopicoPost Topico { get; set; }
 

@@ -26,6 +26,7 @@ namespace SysPost.Controllers
         {
             var query = _context.Posts
                 .Include(p => p.Usuario)
+                .Include(p => p.Comentarios)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(usuarioNome))

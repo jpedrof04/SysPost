@@ -132,6 +132,43 @@ namespace SysPost.Controllers
 
         // ─── EXCLUIR POST ─────────────────────────────────────────────────────
 
+        // ─── DETALHES DO POST (COM COMENTÁRIOS) ──────────────────────────────
+
+        public async Task<IActionResult> DetalhesPost(int id)
+        {
+            var post = await _context.Posts
+                .Include(p => p.Usuario)
+                .Include(p => p.Comentarios)
+                    .ThenInclude(c => c.Usuario)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (post == null)
+                return NotFound();
+
+            return View(post);
+        }
+
+        // ─── EXCLUIR COMENTÁRIO ──────────────────────────────────────────────
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExcluirComentario(int id, int postId)
+        {
+            var comment = await _context.Comments.FindAsync(id);
+
+            if (comment == null)
+            {
+                TempData["Erro"] = "Comentário não encontrado.";
+                return RedirectToAction("DetalhesPost", new { id = postId });
+            }
+
+            _context.Comments.Remove(comment);
+            await _context.SaveChangesAsync();
+
+            TempData["Sucesso"] = "Comentário removido com sucesso.";
+            return RedirectToAction("DetalhesPost", new { id = postId });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ExcluirPost(int id)

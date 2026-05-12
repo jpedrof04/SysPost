@@ -84,48 +84,60 @@
         {
             <div class="col-md-6 col-lg-4">
 
-                <div class="card h-100 shadow-sm border-0">
+                <a asp-controller="Post" asp-action="Detalhes" asp-route-id="@post.Id"
+                   class="text-decoration-none text-white">
 
-                    @if (post.Imagem != null)
-                    {
-                        var base64 = Convert.ToBase64String(post.Imagem);
+                    <div class="card h-100 shadow-sm border-0 card-hover">
 
-                        <img src="data:image/png;base64,@base64"
-                             class="card-img-top"
-                             style="height:220px;object-fit:cover;" />
-                    }
+                        @if (post.Imagem != null)
+                        {
+                            var base64 = Convert.ToBase64String(post.Imagem);
 
-                    <div class="card-body">
+                            <img src="data:image/png;base64,@base64"
+                                 class="card-img-top"
+                                 style="height:220px;object-fit:cover;" />
+                        }
 
-                        <span class="badge bg-success mb-2">
-                            @post.Topico
-                        </span>
+                        <div class="card-body">
 
-                        <h5 class="fw-bold">
-                            @post.Titulo
-                        </h5>
+                            <span class="badge bg-success mb-2">
+                                @post.Topico
+                            </span>
 
-                        <p class="text-muted">
-                            @post.Descricao
-                        </p>
+                            <h5 class="fw-bold text-white">
+                                @post.Titulo
+                            </h5>
+
+                            <p class="text-muted">
+                                @post.Descricao
+                            </p>
+
+                        </div>
+
+                        <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+
+                            <div>
+                                <small class="text-muted d-block">
+                                    <i class="bi bi-person me-1"></i>
+                                    @post.Usuario.NomeCompleto
+                                </small>
+
+                                <small class="text-muted">
+                                    <i class="bi bi-clock me-1"></i>
+                                    @post.DataCriacao.ToString("dd/MM/yyyy HH:mm")
+                                </small>
+                            </div>
+
+                            <span class="badge bg-primary rounded-pill">
+                                <i class="bi bi-chat-dots me-1"></i>
+                                @post.Comentarios.Count
+                            </span>
+
+                        </div>
 
                     </div>
 
-                    <div class="card-footer bg-transparent border-0">
-
-                        <small class="text-muted d-block">
-                            <i class="bi bi-person me-1"></i>
-                            @post.Usuario.NomeCompleto
-                        </small>
-
-                        <small class="text-muted">
-                            <i class="bi bi-clock me-1"></i>
-                            @post.DataCriacao.ToString("dd/MM/yyyy HH:mm")
-                        </small>
-
-                    </div>
-
-                </div>
+                </a>
 
             </div>
         }
