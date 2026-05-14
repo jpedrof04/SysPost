@@ -1,48 +1,182 @@
+@using SysPost.Models
 @{
     ViewData["Title"] = "Dashboard Admin";
+    var usuarios = ViewBag.UsuariosComRoles as List<(Usuario Usuario, IList<string> Roles)>;
+    var posts = ViewBag.TodosPosts as List<Post>;
 }
 
-<div class="admin-page">
-    <div class="container py-4">
-        <div class="d-flex align-items-center gap-3 mb-4">
-            <i class="bi bi-speedometer2 fs-1 text-primary"></i>
-            <h2 class="fw-bold mb-0">Dashboard Administrativo</h2>
-        </div>
+<div class="d-flex align-items-center gap-3 mb-4">
+    <i class="bi bi-shield-fill-check text-primary" style="font-size:2rem;"></i>
+    <h3 class="fw-bold mb-0">Administração</h3>
+</div>
 
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card text-center p-4">
-                    <i class="bi bi-people fs-1 text-primary mb-2"></i>
-                    <h3 class="fw-bold text-primary mb-0">@ViewBag.TotalUsuarios</h3>
-                    <p class="text-muted mb-0">Total de Usuários</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-center p-4">
-                    <i class="bi bi-shield-lock fs-1 text-primary mb-2"></i>
-                    <h3 class="fw-bold text-primary mb-0">@ViewBag.TotalAdmins</h3>
-                    <p class="text-muted mb-0">Administradores</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-center p-4">
-                    <i class="bi bi-person fs-1 text-primary mb-2"></i>
-                    <h3 class="fw-bold text-primary mb-0">@ViewBag.TotalUsers</h3>
-                    <p class="text-muted mb-0">Usuários Comuns</p>
-                </div>
-            </div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-number">@ViewBag.TotalUsuarios</div>
+            <div class="stat-label">Total de Usuários</div>
         </div>
-
-        <div class="mt-4 text-center">
-            <a asp-action="Usuarios" class="btn btn-primary btn-lg px-5">
-                <i class="bi bi-person-gear me-2"></i>Gerenciar Usuários
-            </a>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-shield-fill-check"></i></div>
+            <div class="stat-number">@ViewBag.TotalAdmins</div>
+            <div class="stat-label">Administradores</div>
         </div>
-        <div>
-            <a asp-controller="Admin" asp-action="Posts" class="btn btn-outline-light btn-lg mt-3">
-                <i class="bi bi-file-post me-2"></i>
-                Gerenciar Posts
-            </a>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-person-fill"></i></div>
+            <div class="stat-number">@ViewBag.TotalUsers</div>
+            <div class="stat-label">Usuários Comuns</div>
         </div>
     </div>
 </div>
+
+<hr class="my-4" />
+
+@* ═══════════ USUÁRIOS ═══════════ *@
+<div class="d-flex align-items-center gap-3 mb-3">
+    <i class="bi bi-people-fill text-primary" style="font-size:1.4rem;"></i>
+    <h5 class="fw-bold mb-0">Usuários</h5>
+    <span class="badge bg-primary">@(usuarios?.Count ?? 0)</span>
+</div>
+
+@if (usuarios != null && usuarios.Any())
+{
+    <div class="card p-0 mb-4">
+        <div class="table-responsive">
+            <table class="table table-dark table-borderless align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Usuário</th>
+                        <th>E-mail</th>
+                        <th>Perfil</th>
+                        <th>Membro desde</th>
+                        <th class="text-center pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in usuarios)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-semibold">@item.Usuario.NomeCompleto</td>
+                            <td class="text-muted">@item.Usuario.Email</td>
+                            <td>
+                                @if (item.Roles.Contains("Admin"))
+                                {
+                                    <span class="badge bg-primary">Admin</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Usuário</span>
+                                }
+                            </td>
+                            <td class="text-muted small">@item.Usuario.DataCadastro.ToString("dd/MM/yyyy")</td>
+                            <td class="text-center pe-4">
+                                @if (item.Roles.Contains("Admin"))
+                                {
+                                    <form asp-action="RebaixarUser" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@item.Usuario.Id" />
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-arrow-down me-1"></i>Rebaixar
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="PromoverAdmin" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="userId" value="@item.Usuario.Id" />
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-arrow-up me-1"></i>Promover
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<hr class="my-4" />
+
+@* ═══════════ POSTS (estilo Reddit) ═══════════ *@
+<div class="d-flex align-items-center gap-3 mb-3">
+    <i class="bi bi-file-earmark-post text-primary" style="font-size:1.4rem;"></i>
+    <h5 class="fw-bold mb-0">Posts</h5>
+    <span class="badge bg-primary">@(posts?.Count ?? 0)</span>
+</div>
+
+@if (posts != null && posts.Any())
+{
+    @foreach (var post in posts)
+    {
+        <div class="reddit-card">
+            <div class="vote-col">
+                <button class="vote-btn like" title="Like" onclick="event.preventDefault()">
+                    <i class="bi bi-hand-thumbs-up" style="font-size:1rem;"></i>
+                </button>
+                <span class="vote-count">@post.Comentarios.Count</span>
+                <button class="vote-btn dislike" title="Dislike" onclick="event.preventDefault()">
+                    <i class="bi bi-hand-thumbs-down" style="font-size:1rem;"></i>
+                </button>
+            </div>
+            <div class="content-col">
+                <div class="post-meta">
+                    <span><i class="bi bi-person-fill me-1"></i>@post.Usuario.NomeCompleto</span>
+                    <span class="mx-1">·</span>
+                    <span>@post.DataCriacao.ToString("dd MMM yyyy")</span>
+                    <span class="mx-1">·</span>
+                    <span class="badge bg-success">@post.Topico</span>
+                </div>
+
+                <a asp-action="DetalhesPost" asp-route-id="@post.Id" class="post-title">
+                    @post.Titulo
+                </a>
+
+                <div class="post-desc">@post.Descricao</div>
+
+                <div class="post-footer">
+                    <a asp-action="DetalhesPost" asp-route-id="@post.Id" class="footer-btn">
+                        <i class="bi bi-chat-dots me-1"></i>
+                        @post.Comentarios.Count comentários
+                    </a>
+
+                    <form asp-action="ExcluirPost" method="post" class="d-inline"
+                          onsubmit="return confirm('Excluir este post?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@post.Id" />
+                        <button type="submit" class="footer-btn text-danger">
+                            <i class="bi bi-trash me-1"></i>Excluir
+                        </button>
+                    </form>
+
+                    @if (post.Imagem != null)
+                    {
+                        var base64 = Convert.ToBase64String(post.Imagem);
+                        <img src="data:image/png;base64,@base64" class="post-thumb ms-auto" />
+                    }
+                    else
+                    {
+                        <div class="thumb-placeholder ms-auto">
+                            <i class="bi bi-file-text"></i>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="text-center py-4">
+        <i class="bi bi-inbox text-dim" style="font-size:2rem;"></i>
+        <p class="text-muted mt-2 small">Nenhum post encontrado.</p>
+    </div>
+}

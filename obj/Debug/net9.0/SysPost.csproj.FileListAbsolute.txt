@@ -707,4 +707,4 @@ C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\refint\SysPost.dll
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\SysPost.pdb
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\SysPost.genruntimeconfig.cache
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\ref\SysPost.dll
-C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\dzl11qtb08-ombnpv0ese.gz
+C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\dzl11qtb08-7b5vucr8vw.gz

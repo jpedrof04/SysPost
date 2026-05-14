@@ -3,40 +3,42 @@
     ViewData["Title"] = Model.Post.Titulo;
 }
 
+<a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3">
+    <i class="bi bi-arrow-left me-1"></i>Voltar ao Feed
+</a>
+
 <div class="row g-4">
 
-    @* ─── COLUNA ESQUERDA: POST ─── *@
     <div class="col-lg-8">
 
-        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3">
-            <i class="bi bi-arrow-left me-1"></i>Voltar
-        </a>
-
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card">
             @if (Model.Post.Imagem != null)
             {
                 var base64 = Convert.ToBase64String(Model.Post.Imagem);
                 <img src="data:image/png;base64,@base64"
                      class="card-img-top"
-                     style="max-height:400px;object-fit:cover;border-radius:14px 14px 0 0;" />
+                     style="max-height:400px;object-fit:cover;border-radius:11px 11px 0 0;" />
             }
 
-            <div class="card-body">
-                <span class="badge bg-success mb-2 fs-6">@Model.Post.Topico</span>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-success">@Model.Post.Topico</span>
+                </div>
+
                 <h2 class="fw-bold">@Model.Post.Titulo</h2>
 
-                <div class="d-flex gap-3 text-muted small mb-3">
-                    <span><i class="bi bi-person me-1"></i>@Model.Post.Usuario.NomeCompleto</span>
+                <div class="d-flex gap-3 text-dim small mb-3">
+                    <span><i class="bi bi-person-fill me-1"></i>@Model.Post.Usuario.NomeCompleto</span>
                     <span><i class="bi bi-clock me-1"></i>@Model.Post.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
                 </div>
 
-                <p class="card-text fs-5">@Model.Post.Descricao</p>
+                <p class="fs-5" style="color:var(--text-muted);">@Model.Post.Descricao</p>
 
                 @if (!string.IsNullOrEmpty(Model.Post.Detalhamento))
                 {
                     <hr />
-                    <h5 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Detalhamento</h5>
-                    <div class="bg-dark p-3 rounded">
+                    <h5 class="fw-bold"><i class="bi bi-info-circle me-2 text-primary"></i>Detalhamento</h5>
+                    <div class="p-3 rounded" style="background:var(--bg-hover);">
                         @Html.Raw(Model.Post.Detalhamento.Replace("\n", "<br />"))
                     </div>
                 }
@@ -44,32 +46,37 @@
                 @if (!string.IsNullOrEmpty(Model.Post.InformacaoEspecial))
                 {
                     <hr />
-                    <h5 class="fw-bold"><i class="bi bi-code-slash me-2"></i>Informação Especial</h5>
-                    <div class="bg-dark p-3 rounded border border-primary">
+                    <h5 class="fw-bold"><i class="bi bi-code-slash me-2 text-primary"></i>Informação Especial</h5>
+                    <div class="p-3 rounded" style="background:var(--bg-hover);border:1px solid var(--twitch-purple);">
                         @Html.Raw(Model.Post.InformacaoEspecial.Replace("\n", "<br />"))
                     </div>
                 }
             </div>
 
-            <div class="card-footer bg-transparent border-0 d-flex gap-2">
-                @if (User.Identity?.IsAuthenticated == true)
-                {
+            @if (User.Identity?.IsAuthenticated == true && Model.Post.UsuarioId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+            {
+                <div class="card-footer bg-transparent d-flex gap-2">
                     <a asp-controller="Post" asp-action="Edit" asp-route-id="@Model.Post.Id" class="btn btn-outline-primary btn-sm">
                         <i class="bi bi-pencil me-1"></i>Editar
                     </a>
-                }
-            </div>
+                    <form asp-controller="Post" asp-action="Delete" asp-route-id="@Model.Post.Id" method="post"
+                          onsubmit="return confirm('Excluir este post?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash me-1"></i>Excluir
+                        </button>
+                    </form>
+                </div>
+            }
         </div>
 
     </div>
 
-    @* ─── COLUNA DIREITA: COMENTÁRIOS ─── *@
     <div class="col-lg-4">
 
-        @* ─── FORMULÁRIO DE COMENTÁRIO ─── *@
         @if (User.Identity?.IsAuthenticated == true && Model.Comentarios.Count < 6)
         {
-            <div class="card shadow-sm border-0 mb-4">
+            <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="fw-bold mb-3">
                         <i class="bi bi-pencil-square me-2 text-primary"></i>
@@ -84,8 +91,8 @@
                             <textarea asp-for="NovoComentario"
                                       class="form-control"
                                       rows="3"
-                                      placeholder="Escreva seu comentário..."></textarea>
-                            <span asp-validation-for="NovoComentario" class="text-danger"></span>
+                                      placeholder="O que você acha?"></textarea>
+                            <span asp-validation-for="NovoComentario" class="text-danger small"></span>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100">
@@ -97,28 +104,23 @@
         }
         else if (!User.Identity?.IsAuthenticated == true)
         {
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body text-center">
-                    <p class="text-muted mb-2">
+            <div class="card mb-4">
+                <div class="card-body text-center py-3">
+                    <p class="text-muted small mb-0">
                         <i class="bi bi-box-arrow-in-right me-1"></i>
-                        Faça <a asp-controller="Account" asp-action="Login">login</a> ou
-                        <a asp-controller="Account" asp-action="Register">registre-se</a>
-                        para comentar.
+                        Faça <a asp-controller="Account" asp-action="Login">login</a> para comentar.
                     </p>
                 </div>
             </div>
         }
 
-        @* ─── LISTA DE COMENTÁRIOS ─── *@
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-transparent border-bottom">
-                <h5 class="fw-bold mb-0 d-flex align-items-center justify-content-between">
-                    <span>
-                        <i class="bi bi-chat-dots me-2 text-primary"></i>
-                        Comentários
-                    </span>
-                    <span class="badge bg-primary">@Model.Comentarios.Count/6</span>
+        <div class="card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="fw-bold mb-0">
+                    <i class="bi bi-chat-dots me-2 text-primary"></i>
+                    Comentários
                 </h5>
+                <span class="badge bg-primary">@Model.Comentarios.Count/6</span>
             </div>
 
             <div class="card-body" style="max-height:600px;overflow-y:auto;">
@@ -127,36 +129,31 @@
                 {
                     @foreach (var comentario in Model.Comentarios)
                     {
-                        <div class="d-flex gap-3 mb-3 pb-3 border-bottom border-secondary">
-                            <div class="flex-shrink-0">
-                                @if (comentario.Usuario.FotoPerfil != null)
-                                {
-                                    var fotoBase64 = Convert.ToBase64String(comentario.Usuario.FotoPerfil);
-                                    <img src="data:image;base64,@fotoBase64"
-                                         class="rounded-circle"
-                                         style="width:36px;height:36px;object-fit:cover;" />
-                                }
-                                else
-                                {
-                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
-                                         style="width:36px;height:36px;">
-                                        <i class="bi bi-person text-white small"></i>
-                                    </div>
-                                }
-                            </div>
-                            <div class="flex-grow-1 min-w-0">
-                                <div class="d-flex justify-content-between align-items-center gap-2">
-                                    <strong class="text-truncate">@comentario.Usuario.NomeCompleto</strong>
-                                    <small class="text-muted text-nowrap">@comentario.DataCriacao.ToString("dd/MM")</small>
+                        <div class="comment-item">
+                            @if (comentario.Usuario.FotoPerfil != null)
+                            {
+                                var fotoBase64 = Convert.ToBase64String(comentario.Usuario.FotoPerfil);
+                                <img src="data:image;base64,@fotoBase64" class="comment-avatar" />
+                            }
+                            else
+                            {
+                                <div class="comment-avatar-placeholder">
+                                    <i class="bi bi-person-fill text-dim small"></i>
                                 </div>
-                                <p class="mb-0 mt-1 small">@comentario.Conteudo</p>
+                            }
+                            <div class="comment-body">
+                                <div class="d-flex justify-content-between align-items-center gap-2">
+                                    <span class="comment-author">@comentario.Usuario.NomeCompleto</span>
+                                    <span class="comment-time">@comentario.DataCriacao.ToString("dd/MM")</span>
+                                </div>
+                                <div class="comment-text">@comentario.Conteudo</div>
                             </div>
                         </div>
                     }
                 }
                 else
                 {
-                    <p class="text-muted mb-0 text-center py-3">Nenhum comentário ainda.</p>
+                    <p class="text-muted small text-center py-3 mb-0">Nenhum comentário ainda.</p>
                 }
 
                 @if (Model.Comentarios.Count >= 6)

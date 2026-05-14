@@ -7,16 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SysPost.Controllers
 {
-    /// <summary>
-    /// Área administrativa — acessível somente por usuários com a role "Admin".
-    /// O atributo [Authorize(Roles = "Admin")] na controller bloqueia todas as actions.
-    /// </summary>
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly UserManager<Usuario> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-
         private readonly AppDbContext _context;
 
         public AdminController(
@@ -29,37 +24,31 @@ namespace SysPost.Controllers
             _context = context;
         }
 
-        // ─── DASHBOARD ────────────────────────────────────────────────────────
-
         public async Task<IActionResult> Index()
         {
-            // Conta totais para o painel
             ViewBag.TotalUsuarios = _userManager.Users.Count();
             ViewBag.TotalAdmins = (await _userManager.GetUsersInRoleAsync("Admin")).Count;
             ViewBag.TotalUsers = (await _userManager.GetUsersInRoleAsync("User")).Count;
 
-            return View();
-        }
-
-        // ─── LISTA DE USUÁRIOS ────────────────────────────────────────────────
-
-        public async Task<IActionResult> Usuarios()
-        {
             var usuarios = _userManager.Users.ToList();
-
-            // Para cada usuário, descobrir suas roles
             var listaComRoles = new List<(Usuario Usuario, IList<string> Roles)>();
-
             foreach (var u in usuarios)
             {
                 var roles = await _userManager.GetRolesAsync(u);
                 listaComRoles.Add((u, roles));
             }
+            ViewBag.UsuariosComRoles = listaComRoles;
 
-            return View(listaComRoles);
+            var posts = await _context.Posts
+                .Include(p => p.Usuario)
+                .OrderByDescending(p => p.DataCriacao)
+                .ToListAsync();
+            ViewBag.TodosPosts = posts;
+
+            return View();
         }
 
-        // ─── PROMOVER PARA ADMIN ──────────────────────────────────────────────
+        // ─── PROMOVER ──────────────────────────────────────────────
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -69,7 +58,7 @@ namespace SysPost.Controllers
             if (usuario == null)
             {
                 TempData["Erro"] = "Usuário não encontrado.";
-                return RedirectToAction("Usuarios");
+                return RedirectToAction("Index");
             }
 
             if (!await _userManager.IsInRoleAsync(usuario, "Admin"))
@@ -83,10 +72,10 @@ namespace SysPost.Controllers
                 TempData["Aviso"] = "Este usuário já é Administrador.";
             }
 
-            return RedirectToAction("Usuarios");
+            return RedirectToAction("Index");
         }
 
-        // ─── REBAIXAR PARA USER ───────────────────────────────────────────────
+        // ─── REBAIXAR ──────────────────────────────────────────────
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -96,15 +85,14 @@ namespace SysPost.Controllers
             if (usuario == null)
             {
                 TempData["Erro"] = "Usuário não encontrado.";
-                return RedirectToAction("Usuarios");
+                return RedirectToAction("Index");
             }
 
-            // Impede rebaixar a si mesmo
             var usuarioAtual = await _userManager.GetUserAsync(User);
             if (usuarioAtual?.Id == userId)
             {
                 TempData["Erro"] = "Você não pode alterar sua própria role.";
-                return RedirectToAction("Usuarios");
+                return RedirectToAction("Index");
             }
 
             if (await _userManager.IsInRoleAsync(usuario, "Admin"))
@@ -114,25 +102,10 @@ namespace SysPost.Controllers
                 TempData["Sucesso"] = $"{usuario.NomeCompleto} agora é Usuário comum.";
             }
 
-            return RedirectToAction("Usuarios");
+            return RedirectToAction("Index");
         }
 
-
-        // ─── POSTS DE TODOS OS USUÁRIOS ───────────────────────────────────────
-
-        public async Task<IActionResult> Posts()
-        {
-            var posts = await _context.Posts
-                .Include(p => p.Usuario)
-                .OrderByDescending(p => p.DataCriacao)
-                .ToListAsync();
-
-            return View(posts);
-        }
-
-        // ─── EXCLUIR POST ─────────────────────────────────────────────────────
-
-        // ─── DETALHES DO POST (COM COMENTÁRIOS) ──────────────────────────────
+        // ─── DETALHES DO POST ──────────────────────────────────────
 
         public async Task<IActionResult> DetalhesPost(int id)
         {
@@ -148,7 +121,7 @@ namespace SysPost.Controllers
             return View(post);
         }
 
-        // ─── EXCLUIR COMENTÁRIO ──────────────────────────────────────────────
+        // ─── EXCLUIR COMENTÁRIO ────────────────────────────────────
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -169,6 +142,8 @@ namespace SysPost.Controllers
             return RedirectToAction("DetalhesPost", new { id = postId });
         }
 
+        // ─── EXCLUIR POST ──────────────────────────────────────────
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ExcluirPost(int id)
@@ -178,14 +153,14 @@ namespace SysPost.Controllers
             if (post == null)
             {
                 TempData["Erro"] = "Post não encontrado.";
-                return RedirectToAction("Posts");
+                return RedirectToAction("Index");
             }
 
             _context.Posts.Remove(post);
             await _context.SaveChangesAsync();
 
             TempData["Sucesso"] = "Post removido com sucesso.";
-            return RedirectToAction("Posts");
+            return RedirectToAction("Index");
         }
     }
 }

@@ -4,61 +4,54 @@
 }
 
 <div class="row justify-content-center mt-4">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-transparent">
-                <h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Editar Perfil</h5>
-            </div>
-            <div class="card-body p-4">
-
-                @* Foto atual *@
+    <div class="col-md-8 col-lg-6 auth-card">
+        <div class="card">
+            <div class="card-body">
                 <div class="text-center mb-4">
-                    @if (Model.FotoAtual != null && Model.FotoAtual.Length > 0)
-                    {
-                        var base64 = Convert.ToBase64String(Model.FotoAtual);
+                    <i class="bi bi-pencil text-primary" style="font-size:2rem;"></i>
+                    <h4 class="fw-bold mt-2">Editar Perfil</h4>
+                </div>
+
+                @if (Model.FotoAtual != null && Model.FotoAtual.Length > 0)
+                {
+                    var base64 = Convert.ToBase64String(Model.FotoAtual);
+                    <div class="text-center mb-4">
                         <img src="data:image;base64,@base64"
                              id="preview"
-                             class="rounded-circle mb-2"
-                             style="width:100px;height:100px;object-fit:cover;"
-                             alt="Foto atual" />
-                    }
-                    else
-                    {
-                        <div id="preview-placeholder"
-                             class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-2"
-                             style="width:100px;height:100px;">
-                            <i class="bi bi-person-fill text-white" style="font-size:2.5rem;"></i>
+                             class="profile-avatar" />
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center mb-4">
+                        <div class="profile-avatar-placeholder" id="preview-placeholder">
+                            <i class="bi bi-person-fill text-muted" style="font-size:2.5rem;"></i>
                         </div>
-                    }
-                </div>
+                    </div>
+                }
 
                 <form asp-action="EditarPerfil" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
 
-                    @if (TempData["Sucesso"] != null)
-                    {
-                        <div class="alert alert-success">@TempData["Sucesso"]</div>
-                    }
-
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
 
                     <div class="mb-3">
                         <label asp-for="NomeCompleto" class="form-label"></label>
                         <input asp-for="NomeCompleto" class="form-control" />
-                        <span asp-validation-for="NomeCompleto" class="text-danger"></span>
+                        <span asp-validation-for="NomeCompleto" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Bio" class="form-label"></label>
                         <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="Bio" class="text-danger"></span>
+                        <span asp-validation-for="Bio" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="FotoArquivo" class="form-label"></label>
                         <input asp-for="FotoArquivo" class="form-control" type="file"
                                accept="image/*" onchange="previewFoto(this)" />
-                        <span asp-validation-for="FotoArquivo" class="text-danger"></span>
+                        <span asp-validation-for="FotoArquivo" class="text-danger small"></span>
                         <div class="form-text">Máximo 2MB. Formatos: JPG, PNG, GIF, WEBP.</div>
                     </div>
 
@@ -81,14 +74,12 @@
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = e => {
-                    // Atualiza ou cria o preview
                     let img = document.getElementById('preview');
                     const placeholder = document.getElementById('preview-placeholder');
                     if (!img) {
                         img = document.createElement('img');
                         img.id = 'preview';
-                        img.className = 'rounded-circle mb-2';
-                        img.style = 'width:100px;height:100px;object-fit:cover;display:block;margin:auto;';
+                        img.className = 'profile-avatar';
                         if (placeholder) placeholder.replaceWith(img);
                     }
                     img.src = e.target.result;

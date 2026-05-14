@@ -3,114 +3,123 @@
     ViewData["Title"] = "Detalhes do Post";
 }
 
-<div class="admin-page">
+<a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3">
+    <i class="bi bi-arrow-left me-1"></i>Voltar para Administração
+</a>
 
-    <a asp-action="Posts" class="btn btn-outline-secondary btn-sm mb-3">
-        <i class="bi bi-arrow-left me-1"></i>Voltar para Posts
-    </a>
+<div class="card mb-4">
+    @if (Model.Imagem != null)
+    {
+        var base64 = Convert.ToBase64String(Model.Imagem);
+        <img src="data:image/png;base64,@base64"
+             class="card-img-top"
+             style="max-height:350px;object-fit:cover;border-radius:11px 11px 0 0;" />
+    }
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body">
-            <span class="badge bg-success mb-2 fs-6">@Model.Topico</span>
-            <h3 class="fw-bold">@Model.Titulo</h3>
-
-            <div class="d-flex gap-3 text-muted small mb-3">
-                <span><i class="bi bi-person me-1"></i>@Model.Usuario.NomeCompleto</span>
-                <span><i class="bi bi-clock me-1"></i>@Model.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
-            </div>
-
-            <p class="card-text">@Model.Descricao</p>
-
-            @if (!string.IsNullOrEmpty(Model.Detalhamento))
-            {
-                <hr />
-                <h5 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Detalhamento</h5>
-                <div class="bg-dark p-3 rounded">
-                    @Html.Raw(Model.Detalhamento.Replace("\n", "<br />"))
-                </div>
-            }
-
-            @if (!string.IsNullOrEmpty(Model.InformacaoEspecial))
-            {
-                <hr />
-                <h5 class="fw-bold"><i class="bi bi-code-slash me-2"></i>Informação Especial</h5>
-                <div class="bg-dark p-3 rounded border border-primary">
-                    @Html.Raw(Model.InformacaoEspecial.Replace("\n", "<br />"))
-                </div>
-            }
+    <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+            <span class="badge bg-success fs-6">@Model.Topico</span>
+            <span class="badge bg-primary"><i class="bi bi-person-fill me-1"></i>@Model.Usuario.NomeCompleto</span>
+            <span class="badge bg-info"><i class="bi bi-clock me-1"></i>@Model.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
         </div>
+
+        <h4 class="fw-bold">@Model.Titulo</h4>
+        <p style="color:var(--text-muted);">@Model.Descricao</p>
+
+        @if (!string.IsNullOrEmpty(Model.Detalhamento))
+        {
+            <hr />
+            <h5 class="fw-bold"><i class="bi bi-info-circle me-2 text-primary"></i>Detalhamento</h5>
+            <div class="p-3 rounded" style="background:var(--bg-hover);">
+                @Html.Raw(Model.Detalhamento.Replace("\n", "<br />"))
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.InformacaoEspecial))
+        {
+            <hr />
+            <h5 class="fw-bold"><i class="bi bi-code-slash me-2 text-primary"></i>Informação Especial</h5>
+            <div class="p-3 rounded" style="background:var(--bg-hover);border:1px solid var(--twitch-purple);">
+                @Html.Raw(Model.InformacaoEspecial.Replace("\n", "<br />"))
+            </div>
+        }
+    </div>
+</div>
+
+@* ═══════════ COMENTÁRIOS — estilo Reddit ═══════════ *@
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="fw-bold mb-0">
+            <i class="bi bi-chat-dots text-primary me-2"></i>
+            Comentários
+        </h5>
+        <span class="badge bg-primary">@Model.Comentarios.Count / 6</span>
     </div>
 
-    @* ─── COMENTÁRIOS ─── *@
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-transparent border-bottom">
-            <h5 class="fw-bold mb-0">
-                <i class="bi bi-chat-dots me-2 text-primary"></i>
-                Comentários (@Model.Comentarios.Count/6)
-            </h5>
-        </div>
-
-        <div class="card-body">
-            @if (Model.Comentarios.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-dark table-hover align-middle">
-                        <thead>
-                            <tr>
-                                <th>Usuário</th>
-                                <th>Comentário</th>
-                                <th>Data</th>
-                                <th width="100">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var comentario in Model.Comentarios.OrderByDescending(c => c.DataCriacao))
+    <div class="card-body p-0">
+        @if (Model.Comentarios.Any())
+        {
+            <div style="max-height:500px;overflow-y:auto;">
+                @foreach (var comentario in Model.Comentarios.OrderByDescending(c => c.DataCriacao))
+                {
+                    <div class="comment-item p-3" style="border-bottom:1px solid var(--border-subtle);">
+                        <div class="d-flex gap-3 w-100">
+                            @if (comentario.Usuario.FotoPerfil != null)
                             {
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            @if (comentario.Usuario.FotoPerfil != null)
-                                            {
-                                                var fotoBase64 = Convert.ToBase64String(comentario.Usuario.FotoPerfil);
-                                                <img src="data:image;base64,@fotoBase64"
-                                                     class="rounded-circle"
-                                                     style="width:32px;height:32px;object-fit:cover;" />
-                                            }
-                                            else
-                                            {
-                                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center"
-                                                     style="width:32px;height:32px;">
-                                                    <i class="bi bi-person text-white small"></i>
-                                                </div>
-                                            }
-                                            <strong>@comentario.Usuario.NomeCompleto</strong>
-                                        </div>
-                                    </td>
-                                    <td>@comentario.Conteudo</td>
-                                    <td>@comentario.DataCriacao.ToString("dd/MM/yyyy HH:mm")</td>
-                                    <td>
-                                        <form asp-action="ExcluirComentario"
-                                              method="post"
-                                              onsubmit="return confirm('Excluir este comentário?');">
+                                var fotoBase64 = Convert.ToBase64String(comentario.Usuario.FotoPerfil);
+                                <img src="data:image;base64,@fotoBase64" class="comment-avatar mt-1" style="width:40px;height:40px;" />
+                            }
+                            else
+                            {
+                                <div class="comment-avatar-placeholder mt-1" style="width:40px;height:40px;">
+                                    <i class="bi bi-person-fill text-dim"></i>
+                                </div>
+                            }
+
+                            <div class="comment-body">
+                                <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="comment-author fs-6">@comentario.Usuario.NomeCompleto</span>
+                                        <span class="badge bg-primary" style="font-size:0.65rem;">@(comentario.Usuario.Email)</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="comment-time">@comentario.DataCriacao.ToString("dd/MM/yyyy HH:mm")</span>
+                                        <form asp-action="ExcluirComentario" method="post" class="d-inline"
+                                              onsubmit="return confirm('Excluir comentário?');">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@comentario.Id" />
                                             <input type="hidden" name="postId" value="@Model.Id" />
-                                            <button type="submit" class="btn btn-danger btn-sm">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size:0.75rem;">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <p class="text-muted mb-0">Nenhum comentário neste post.</p>
-            }
-        </div>
-    </div>
+                                    </div>
+                                </div>
+                                <div class="comment-text mt-2" style="font-size:0.95rem;color:var(--text-primary);">
+                                    @comentario.Conteudo
+                                </div>
 
+                                @* Ações do comentário estilo Reddit *@
+                                <div class="d-flex gap-3 mt-2">
+                                    <button class="footer-btn" onclick="event.preventDefault()">
+                                        <i class="bi bi-hand-thumbs-up me-1"></i>0
+                                    </button>
+                                    <button class="footer-btn" onclick="event.preventDefault()">
+                                        <i class="bi bi-hand-thumbs-down me-1"></i>0
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-chat-dots text-dim" style="font-size:2rem;"></i>
+                <p class="text-muted small mt-2 mb-0">Nenhum comentário neste post.</p>
+            </div>
+        }
+    </div>
 </div>

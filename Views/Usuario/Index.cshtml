@@ -7,81 +7,74 @@
 <div class="row justify-content-center mt-4">
     <div class="col-md-8 col-lg-6">
 
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-body text-center p-4">
-
+        <div class="card mb-4">
+            <div class="profile-header">
                 @if (Model.FotoPerfil != null && Model.FotoPerfil.Length > 0)
                 {
                     var base64 = Convert.ToBase64String(Model.FotoPerfil);
-                    <img src="data:image;base64,@base64"
-                         class="rounded-circle mb-3"
-                         style="width:120px;height:120px;object-fit:cover;"
-                         alt="Foto de perfil" />
+                    <img src="data:image;base64,@base64" class="profile-avatar" alt="Foto" />
                 }
                 else
                 {
-                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3"
-                         style="width:120px;height:120px;">
-                        <i class="bi bi-person-fill text-white" style="font-size:3rem;"></i>
+                    <div class="profile-avatar-placeholder">
+                        <i class="bi bi-person-fill text-muted" style="font-size:2.5rem;"></i>
                     </div>
                 }
 
                 <h4 class="fw-bold mb-1">@Model.NomeCompleto</h4>
-                <p class="text-muted mb-1"><i class="bi bi-envelope me-1"></i>@Model.Email</p>
+                <p class="text-muted small mb-1"><i class="bi bi-envelope-fill me-1"></i>@Model.Email</p>
 
-                <span class="badge @(Model.Perfil == "Admin" ? "bg-primary" : "bg-success") mb-3">
-                    @Model.Perfil
-                </span>
+                <span class="badge bg-primary mb-3">@Model.Perfil</span>
 
                 @if (!string.IsNullOrEmpty(Model.Bio))
                 {
-                    <p class="text-muted">@Model.Bio</p>
+                    <p class="text-muted small">@Model.Bio</p>
                 }
 
-                <p class="text-muted small">
+                <p class="text-dim small">
                     <i class="bi bi-calendar me-1"></i>
                     Membro desde @Model.DataCadastro.ToString("dd/MM/yyyy")
                 </p>
 
                 <div class="d-flex justify-content-center gap-2 flex-wrap">
-                    <button class="btn btn-primary" onclick="toggleEdit()">
+                    <button class="btn btn-outline-primary btn-sm" onclick="toggleEdit()">
                         <i class="bi bi-pencil me-1"></i>Editar Perfil
                     </button>
 
                     @if (Model.Perfil == "Admin")
                     {
-                        <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-warning fw-bold">
-                            <i class="bi bi-shield-lock me-1"></i>Administração
+                        <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-shield-fill-check me-1"></i>Administração
                         </a>
                     }
                 </div>
             </div>
         </div>
 
-        <div id="editCard" class="card shadow-sm border-0" style="display:@(exibirForm ? "block" : "none")">
-            <div class="card-header bg-transparent">
-                <h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Editar Perfil</h5>
-            </div>
+        <div class="card" id="editCard" style="display:@(exibirForm ? "block" : "none")">
             <div class="card-body p-4">
-
                 <div class="text-center mb-4">
-                    @if (Model.FotoPerfil != null && Model.FotoPerfil.Length > 0)
-                    {
-                        var base64 = Convert.ToBase64String(Model.FotoPerfil);
+                    <i class="bi bi-pencil text-primary" style="font-size:1.5rem;"></i>
+                    <h5 class="fw-bold mt-2">Editar Perfil</h5>
+                </div>
+
+                @if (Model.FotoPerfil != null && Model.FotoPerfil.Length > 0)
+                {
+                    var base64 = Convert.ToBase64String(Model.FotoPerfil);
+                    <div class="text-center mb-4">
                         <img src="data:image;base64,@base64"
                              id="preview"
-                             class="rounded-circle mb-2"
-                             style="width:100px;height:100px;object-fit:cover;" />
-                    }
-                    else
-                    {
-                        <div id="preview-placeholder"
-                             class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-2"
-                             style="width:100px;height:100px;">
-                            <i class="bi bi-person-fill text-white" style="font-size:2.5rem;"></i>
+                             class="profile-avatar" style="width:80px;height:80px;" />
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center mb-4">
+                        <div class="profile-avatar-placeholder" id="preview-placeholder" style="width:80px;height:80px;">
+                            <i class="bi bi-person-fill text-muted" style="font-size:2rem;"></i>
                         </div>
-                    }
-                </div>
+                    </div>
+                }
 
                 <form asp-action="EditarPerfil" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
@@ -107,9 +100,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-lg me-1"></i>Salvar
                         </button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="toggleEdit()">
-                            Cancelar
-                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="toggleEdit()">Cancelar</button>
                     </div>
                 </form>
             </div>
@@ -135,8 +126,8 @@
                     if (!img) {
                         img = document.createElement('img');
                         img.id = 'preview';
-                        img.className = 'rounded-circle mb-2';
-                        img.style = 'width:100px;height:100px;object-fit:cover;display:block;margin:auto;';
+                        img.className = 'profile-avatar';
+                        img.style = 'width:80px;height:80px;';
                         if (placeholder) placeholder.replaceWith(img);
                     }
                     img.src = e.target.result;
