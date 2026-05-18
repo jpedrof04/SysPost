@@ -106,7 +106,7 @@
 
 <hr class="my-4" />
 
-@* ═══════════ POSTS (estilo Reddit) ═══════════ *@
+@* ═══════════ POSTS ═══════════ *@
 <div class="d-flex align-items-center gap-3 mb-3">
     <i class="bi bi-file-earmark-post text-primary" style="font-size:1.4rem;"></i>
     <h5 class="fw-bold mb-0">Posts</h5>
@@ -115,63 +115,64 @@
 
 @if (posts != null && posts.Any())
 {
-    @foreach (var post in posts)
-    {
-        <div class="reddit-card">
-            <div class="vote-col">
-                <button class="vote-btn like" title="Like" onclick="event.preventDefault()">
-                    <i class="bi bi-hand-thumbs-up" style="font-size:1rem;"></i>
-                </button>
-                <span class="vote-count">@post.Comentarios.Count</span>
-                <button class="vote-btn dislike" title="Dislike" onclick="event.preventDefault()">
-                    <i class="bi bi-hand-thumbs-down" style="font-size:1rem;"></i>
-                </button>
-            </div>
-            <div class="content-col">
-                <div class="post-meta">
-                    <span><i class="bi bi-person-fill me-1"></i>@post.Usuario.NomeCompleto</span>
-                    <span class="mx-1">·</span>
-                    <span>@post.DataCriacao.ToString("dd MMM yyyy")</span>
-                    <span class="mx-1">·</span>
+    <div class="posts-grid">
+        @foreach (var post in posts)
+        {
+            <div class="post-card">
+                <div class="post-card-header">
+                    <div class="post-author">
+                        <div class="author-avatar">
+                            @if (post.Usuario.FotoPerfil != null)
+                            {
+                                <img src="data:image/png;base64,@Convert.ToBase64String(post.Usuario.FotoPerfil)" />
+                            }
+                            else
+                            {
+                                <i class="bi bi-person-fill"></i>
+                            }
+                        </div>
+                        <div class="author-info">
+                            <span class="author-name">@post.Usuario.NomeCompleto</span>
+                            <span class="post-date">@post.DataCriacao.ToString("dd MMM yyyy")</span>
+                        </div>
+                    </div>
                     <span class="badge bg-success">@post.Topico</span>
                 </div>
 
-                <a asp-action="DetalhesPost" asp-route-id="@post.Id" class="post-title">
-                    @post.Titulo
-                </a>
+                <div class="post-card-body">
+                    <a asp-action="DetalhesPost" asp-route-id="@post.Id" class="post-card-title">
+                        @post.Titulo
+                    </a>
+                    <p class="post-card-desc">@post.Descricao</p>
+                </div>
 
-                <div class="post-desc">@post.Descricao</div>
+                @if (post.Imagem != null)
+                {
+                    var base64 = Convert.ToBase64String(post.Imagem);
+                    <div class="post-card-img">
+                        <img src="data:image/png;base64,@base64" />
+                    </div>
+                }
 
-                <div class="post-footer">
-                    <a asp-action="DetalhesPost" asp-route-id="@post.Id" class="footer-btn">
-                        <i class="bi bi-chat-dots me-1"></i>
-                        @post.Comentarios.Count comentários
+                <div class="post-card-footer">
+                    <a asp-action="DetalhesPost" asp-route-id="@post.Id" class="post-action">
+                        <i class="bi bi-chat-dots"></i>
+                        <span>@post.Comentarios.Count</span>
                     </a>
 
                     <form asp-action="ExcluirPost" method="post" class="d-inline"
                           onsubmit="return confirm('Excluir este post?');">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@post.Id" />
-                        <button type="submit" class="footer-btn text-danger">
-                            <i class="bi bi-trash me-1"></i>Excluir
+                        <button type="submit" class="post-action text-danger">
+                            <i class="bi bi-trash"></i>
+                            <span>Excluir</span>
                         </button>
                     </form>
-
-                    @if (post.Imagem != null)
-                    {
-                        var base64 = Convert.ToBase64String(post.Imagem);
-                        <img src="data:image/png;base64,@base64" class="post-thumb ms-auto" />
-                    }
-                    else
-                    {
-                        <div class="thumb-placeholder ms-auto">
-                            <i class="bi bi-file-text"></i>
-                        </div>
-                    }
                 </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 }
 else
 {

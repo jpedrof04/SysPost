@@ -21,7 +21,7 @@
         <nav class="sidebar">
             <div class="sidebar-brand">
                 <a asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-twitch"></i>
+                    <i class="bi bi-pen-fill"></i>
                     <span>SysPost</span>
                 </a>
             </div>
@@ -89,35 +89,34 @@
         </nav>
 
         <main class="main-content">
-
-        @if (TempData["Sucesso"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                @TempData["Sucesso"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
-        @if (TempData["Erro"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                @TempData["Erro"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
-        @if (TempData["Aviso"] != null)
-        {
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <i class="bi bi-info-circle-fill me-2"></i>
-                @TempData["Aviso"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-
             <div class="container">
+                @if (TempData["Sucesso"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        @TempData["Sucesso"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["Erro"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        @TempData["Erro"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["Aviso"] != null)
+                {
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        @TempData["Aviso"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
                 @RenderBody()
             </div>
         </main>
@@ -125,7 +124,7 @@
 
     <footer class="footer-bar">
         <small class="text-muted">
-            <i class="bi bi-twitch me-1"></i>
+            <i class="bi bi-pen-fill me-1"></i>
             &copy; @DateTime.Now.Year — SysPost
         </small>
     </footer>

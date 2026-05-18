@@ -695,8 +695,6 @@ C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\s65wc6gz82
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\gnye6e61w4-9vr69e8ynj.gz
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\8a523xaiso-87fc7y1x7t.gz
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\9bl0dtamlk-mlv21k5csn.gz
-C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\efxn4cdh4t-zlm11qhfmi.gz
-C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\qpkos69j7o-zlm11qhfmi.gz
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\staticwebassets.build.json
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\staticwebassets.development.json
@@ -707,7 +705,6 @@ C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\refint\SysPost.dll
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\SysPost.pdb
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\SysPost.genruntimeconfig.cache
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\ref\SysPost.dll
-C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\dzl11qtb08-7b5vucr8vw.gz
 C:\Users\joaof\Desktop\code\SysPost\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\joaof\Desktop\code\SysPost\bin\Debug\net9.0\appsettings.json
 C:\Users\joaof\Desktop\code\SysPost\bin\Debug\net9.0\det.json
@@ -944,3 +941,6 @@ C:\Users\joaof\Desktop\code\SysPost\obj\Debug\net9.0\ref\SysPost.dll
 C:\Users\joaof\Desktop\code\SysPost\obj\Debug\net9.0\compressed\w1r405wiu5-{0}-zppmnb91np-zppmnb91np.gz
 C:\Users\joaof\Desktop\code\SysPost\obj\Debug\net9.0\compressed\rxi0xkjw6s-{0}-zppmnb91np-zppmnb91np.gz
 C:\Users\joaof\Desktop\code\SysPost\obj\Debug\net9.0\compressed\bu1py64gyw-{0}-6xvw8wlmfz-6xvw8wlmfz.gz
+C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\dzl11qtb08-6xvw8wlmfz.gz
+C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\efxn4cdh4t-n3oaff9dd2.gz
+C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\qpkos69j7o-n3oaff9dd2.gz
