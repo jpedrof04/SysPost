@@ -244,6 +244,7 @@ public class PostController : Controller
         var usuario = await _userManager.GetUserAsync(User);
 
         var post = await _context.Posts
+            .Include(p => p.Comentarios)
             .FirstOrDefaultAsync(p =>
                 p.Id == id &&
                 p.UsuarioId == usuario!.Id);
@@ -251,6 +252,7 @@ public class PostController : Controller
         if (post == null)
             return NotFound();
 
+        _context.Comments.RemoveRange(post.Comentarios);
         _context.Posts.Remove(post);
 
         await _context.SaveChangesAsync();
@@ -282,11 +284,14 @@ public class PostController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteAdmin(int id)
     {
-        var post = await _context.Posts.FindAsync(id);
+        var post = await _context.Posts
+            .Include(p => p.Comentarios)
+            .FirstOrDefaultAsync(p => p.Id == id);
 
         if (post == null)
             return NotFound();
 
+        _context.Comments.RemoveRange(post.Comentarios);
         _context.Posts.Remove(post);
 
         await _context.SaveChangesAsync();

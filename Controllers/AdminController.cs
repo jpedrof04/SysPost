@@ -148,7 +148,9 @@ namespace SysPost.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ExcluirPost(int id)
         {
-            var post = await _context.Posts.FindAsync(id);
+            var post = await _context.Posts
+                .Include(p => p.Comentarios)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (post == null)
             {
@@ -156,6 +158,7 @@ namespace SysPost.Controllers
                 return RedirectToAction("Index");
             }
 
+            _context.Comments.RemoveRange(post.Comentarios);
             _context.Posts.Remove(post);
             await _context.SaveChangesAsync();
 
