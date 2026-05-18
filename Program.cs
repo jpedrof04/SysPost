@@ -12,7 +12,7 @@ builder.Services.AddScoped<QueryMonitorInterceptor>();
 
 builder.Services.AddDbContext<AppDbContext>((sp, options) =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoSecundaria"));
     options.AddInterceptors(sp.GetRequiredService<QueryMonitorInterceptor>());
 });
 

@@ -4,138 +4,153 @@
     var posts = ViewBag.Posts as List<Post>;
     var filtroNome = ViewBag.FiltroUsuarioNome as string;
     var filtroTopico = ViewBag.FiltroTopico as TopicoPost?;
-}
-
-<div class="d-flex align-items-center gap-3 mb-3">
-    <i class="bi bi-twitch text-primary" style="font-size:1.6rem;"></i>
-    <h4 class="fw-bold mb-0">Feed</h4>
-    <span class="badge bg-primary">@(posts?.Count ?? 0) posts</span>
-
-    @if (User.Identity?.IsAuthenticated == true)
-    {
-        <a asp-controller="Post" asp-action="Create" class="btn btn-primary btn-sm ms-auto">
-            <i class="bi bi-plus-circle me-1"></i> Novo Post
-        </a>
-    }
-</div>
-
-@{
     var dbQueries = ViewBag.DbQueries as int?;
     var dbTimeMs = ViewBag.DbTimeMs as double?;
     var dbLastMs = ViewBag.DbLastMs as double?;
 }
 
-@if (dbQueries.HasValue && dbQueries > 0)
-{
-    <div class="db-monitor d-flex gap-3 small text-dim">
-        <span><i class="bi bi-database me-1"></i>Queries: <strong class="text-primary">@dbQueries</strong></span>
-        <span><i class="bi bi-clock me-1"></i>Total: <strong class="text-primary">@dbTimeMs?.ToString("F2") ms</strong></span>
-        <span><i class="bi bi-activity me-1"></i>Última: <strong class="text-primary">@dbLastMs?.ToString("F2") ms</strong></span>
-    </div>
-}
+<div class="feed-layout">
 
-<div class="filter-bar">
-    <form method="get" action="/" class="row g-2 align-items-end">
-        <div class="col-md-5">
-            <div class="filter-label"><i class="bi bi-person me-1"></i>Usuário</div>
-            <input type="text" name="usuarioNome" class="form-control form-control-sm"
-                   placeholder="Filtrar por usuário..." value="@filtroNome" />
-        </div>
-        <div class="col-md-5">
-            <div class="filter-label"><i class="bi bi-tag me-1"></i>Tópico</div>
-            <select name="topico" class="form-select form-select-sm">
-                <option value="">Todos os tópicos</option>
-                @foreach (var t in Enum.GetValues<TopicoPost>())
-                {
-                    var selected = filtroTopico.HasValue && filtroTopico.Value == t;
-                    <option value="@((int)t)" selected="@selected">@t</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-2 d-flex gap-1">
-            <button type="submit" class="btn btn-primary btn-sm w-100">
-                <i class="bi bi-search me-1"></i>Filtrar
-            </button>
-            @if (!string.IsNullOrEmpty(filtroNome) || filtroTopico.HasValue)
+    <!-- ─── POSTS ─── -->
+    <div class="feed-posts">
+        @if (posts != null && posts.Any())
+        {
+            @foreach (var post in posts)
             {
-                <a href="/" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-x-lg"></i>
-                </a>
-            }
-        </div>
-    </form>
-</div>
-
-@if (posts != null && posts.Any())
-{
-    @foreach (var post in posts)
-    {
-        <div class="reddit-card">
-            <div class="vote-col">
-                <button class="vote-btn like" title="Like" onclick="event.preventDefault()">
-                    <i class="bi bi-hand-thumbs-up" style="font-size:1rem;"></i>
-                </button>
-                <span class="vote-count">@post.Comentarios.Count</span>
-                <button class="vote-btn dislike" title="Dislike" onclick="event.preventDefault()">
-                    <i class="bi bi-hand-thumbs-down" style="font-size:1rem;"></i>
-                </button>
-            </div>
-            <div class="content-col">
-                <div class="post-meta">
-                    <a asp-controller="Home" asp-action="Index" asp-route-usuarioNome="@post.Usuario.NomeCompleto">
-                        <i class="bi bi-person-fill me-1"></i>@post.Usuario.NomeCompleto
-                    </a>
-                    <span class="mx-1">·</span>
-                    <span>@post.DataCriacao.ToString("dd MMM yyyy")</span>
-                    <span class="mx-1">·</span>
-                    <a asp-controller="Home" asp-action="Index" asp-route-topico="@((int)post.Topico)">
-                        <span class="badge bg-success">@post.Topico</span>
-                    </a>
-                </div>
-
-                <a asp-controller="Post" asp-action="Detalhes" asp-route-id="@post.Id" class="post-title">
-                    @post.Titulo
-                </a>
-
-                <div class="post-desc">@post.Descricao</div>
-
-                <div class="post-footer">
-                    <a asp-controller="Post" asp-action="Detalhes" asp-route-id="@post.Id" class="footer-btn">
-                        <i class="bi bi-chat-dots me-1"></i>
-                        @post.Comentarios.Count comentários
-                    </a>
-
-                    @if (User.Identity?.IsAuthenticated == true && post.UsuarioId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
-                    {
-                        <a asp-controller="Post" asp-action="Edit" asp-route-id="@post.Id" class="footer-btn">
-                            <i class="bi bi-pencil me-1"></i>Editar
+                <div class="post-card">
+                    <div class="post-card-header">
+                        <div class="post-author">
+                            <div class="author-avatar">
+                                @if (post.Usuario.FotoPerfil != null)
+                                {
+                                    <img src="data:image/png;base64,@Convert.ToBase64String(post.Usuario.FotoPerfil)" />
+                                }
+                                else
+                                {
+                                    <i class="bi bi-person-fill"></i>
+                                }
+                            </div>
+                            <div class="author-info">
+                                <a asp-controller="Home" asp-action="Index" asp-route-usuarioNome="@post.Usuario.NomeCompleto" class="author-name">
+                                    @post.Usuario.NomeCompleto
+                                </a>
+                                <span class="post-date">@post.DataCriacao.ToString("dd MMM yyyy")</span>
+                            </div>
+                        </div>
+                        <a asp-controller="Home" asp-action="Index" asp-route-topico="@((int)post.Topico)">
+                            <span class="topic-badge">@post.Topico</span>
                         </a>
-                    }
+                    </div>
+
+                    <div class="post-card-body">
+                        <a asp-controller="Post" asp-action="Detalhes" asp-route-id="@post.Id" class="post-card-title">
+                            @post.Titulo
+                        </a>
+                        <p class="post-card-desc">@post.Descricao</p>
+                    </div>
 
                     @if (post.Imagem != null)
                     {
                         var base64 = Convert.ToBase64String(post.Imagem);
-                        <img src="data:image/png;base64,@base64" class="post-thumb ms-auto" />
-                    }
-                    else
-                    {
-                        <div class="thumb-placeholder ms-auto">
-                            <i class="bi bi-file-text"></i>
+                        <div class="post-card-img">
+                            <img src="data:image/png;base64,@base64" />
                         </div>
                     }
+
+                    <div class="post-card-footer">
+                        <a asp-controller="Post" asp-action="Detalhes" asp-route-id="@post.Id" class="post-action">
+                            <i class="bi bi-chat-dots"></i>
+                            <span>@post.Comentarios.Count</span>
+                        </a>
+
+                        <button class="post-action" onclick="event.preventDefault()">
+                            <i class="bi bi-hand-thumbs-up"></i>
+                            <span>Curtir</span>
+                        </button>
+
+                        @if (User.Identity?.IsAuthenticated == true && post.UsuarioId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                        {
+                            <a asp-controller="Post" asp-action="Edit" asp-route-id="@post.Id" class="post-action">
+                                <i class="bi bi-pencil"></i>
+                                <span>Editar</span>
+                            </a>
+                        }
+                    </div>
                 </div>
-            </div>
-        </div>
-    }
-}
-else
-{
-    <div class="text-center py-5">
-        <i class="bi bi-inbox text-dim" style="font-size:3rem;"></i>
-        <p class="text-muted mt-3">Nenhum post encontrado.</p>
-        @if (!User.Identity?.IsAuthenticated == true)
+            }
+        }
+        else
         {
-            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm">Entrar para criar</a>
+            <div class="text-center py-5">
+                <i class="bi bi-inbox text-dim" style="font-size:3rem;"></i>
+                <p class="text-muted mt-3">Nenhum post encontrado.</p>
+                @if (!User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm">Entrar para criar</a>
+                }
+            </div>
         }
     </div>
-}
+
+    <!-- ─── SIDEBAR DIREITA ─── -->
+    <aside class="feed-sidebar">
+        <div class="feed-sidebar-section">
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-twitch text-primary" style="font-size:1.3rem;"></i>
+                <h5 class="fw-bold mb-0">Feed</h5>
+                <span class="badge bg-primary ms-auto">@(posts?.Count ?? 0)</span>
+            </div>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Post" asp-action="Create" class="btn btn-primary btn-sm w-100 mt-1">
+                    <i class="bi bi-plus-circle me-1"></i> Novo Post
+                </a>
+            }
+        </div>
+
+        @if (dbQueries.HasValue && dbQueries > 0)
+        {
+            <div class="feed-sidebar-section">
+                <div class="sidebar-section-title">Monitor</div>
+                <div class="db-stat"><i class="bi bi-database"></i> Queries: <strong>@dbQueries</strong></div>
+                <div class="db-stat"><i class="bi bi-clock"></i> Total: <strong>@dbTimeMs?.ToString("F2") ms</strong></div>
+                <div class="db-stat"><i class="bi bi-activity"></i> Última: <strong>@dbLastMs?.ToString("F2") ms</strong></div>
+            </div>
+        }
+
+        <div class="feed-sidebar-section">
+            <div class="sidebar-section-title">Filtros</div>
+            <form method="get" action="/">
+                <div class="mb-2">
+                    <label class="filter-label"><i class="bi bi-person me-1"></i>Usuário</label>
+                    <input type="text" name="usuarioNome" class="form-control form-control-sm"
+                           placeholder="Filtrar..." value="@filtroNome" />
+                </div>
+                <div class="mb-2">
+                    <label class="filter-label"><i class="bi bi-tag me-1"></i>Tópico</label>
+                    <select name="topico" class="form-select form-select-sm">
+                        <option value="">Todos</option>
+                        @foreach (var t in Enum.GetValues<TopicoPost>())
+                        {
+                            var selected = filtroTopico.HasValue && filtroTopico.Value == t;
+                            <option value="@((int)t)" selected="@selected">@t</option>
+                        }
+                    </select>
+                </div>
+                <div class="d-flex gap-1">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="bi bi-search"></i> Filtrar
+                    </button>
+                    @if (!string.IsNullOrEmpty(filtroNome) || filtroTopico.HasValue)
+                    {
+                        <a href="/" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    }
+                </div>
+            </form>
+        </div>
+    </aside>
+
+</div>
