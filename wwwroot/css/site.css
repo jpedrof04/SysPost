@@ -202,7 +202,7 @@ body {
 .feed-posts {
   flex: 1;
   min-width: 0;
-  max-width: 640px;
+  max-width: 720px;
 }
 
 .feed-sidebar {
@@ -339,7 +339,7 @@ body {
 
 /* ─── BODY ───────────────────────────────────── */
 .post-card-body {
-  padding: 6px 14px 4px;
+  padding: 8px 16px 6px;
 }
 
 .post-card-title {
@@ -1180,8 +1180,8 @@ a:not(.btn):not(.nav-link):not(.dropdown-item):hover {
 /* ═══════════════════ POSTS GRID (Meus Posts) ═══════════════════ */
 .posts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 14px;
 }
 
 .posts-grid .post-card {
@@ -1208,6 +1208,25 @@ a:not(.btn):not(.nav-link):not(.dropdown-item):hover {
 .comment-body .btn-outline-danger {
   font-size: 0.75rem !important;
   padding: 1px 6px !important;
+}
+
+/* Desktop-only: slightly bigger cards and images */
+@media (min-width: 769px) {
+  .post-card-img img {
+    max-height: 270px;
+  }
+
+  .posts-grid .post-card-img img {
+    max-height: 200px;
+  }
+
+  .post-card-body {
+    padding: 10px 18px 8px;
+  }
+
+  .post-card-header {
+    padding: 12px 18px 0;
+  }
 }
 
 /* Mobile sidebar toggle button */
