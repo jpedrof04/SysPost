@@ -28,14 +28,32 @@
                             <span class="post-date">@post.DataCriacao.ToString("dd MMM yyyy")</span>
                         </div>
                     </div>
-                    <span class="badge bg-success">@post.Topico</span>
+                    <div class="post-card-header-right">
+                        <a asp-controller="Home" asp-action="Index" asp-route-topico="@((int)post.Topico)">
+                            <span class="topic-badge">@post.Topico</span>
+                        </a>
+                        <a asp-controller="Post" asp-action="Detalhes" asp-route-id="@post.Id" class="ver-mais-link">ver +</a>
+                    </div>
                 </div>
 
                 <div class="post-card-body">
-                    <a asp-action="Detalhes" asp-route-id="@post.Id" class="post-card-title">
+                    <a asp-controller="Post" asp-action="Detalhes" asp-route-id="@post.Id" class="post-card-title">
                         @post.Titulo
                     </a>
                     <p class="post-card-desc">@post.Descricao</p>
+
+                    @if (!string.IsNullOrEmpty(post.Detalhamento))
+                    {
+                        <div class="card-info-section">@post.Detalhamento</div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(post.InformacaoEspecial))
+                    {
+                        <div class="card-info-section info-special">
+                            <i class="bi bi-code-slash me-1"></i>
+                            @post.InformacaoEspecial
+                        </div>
+                    }
                 </div>
 
                 @if (post.Imagem != null)
@@ -47,10 +65,10 @@
                 }
 
                 <div class="post-card-footer">
-                    <a asp-action="Detalhes" asp-route-id="@post.Id" class="post-action">
+                    <button type="button" class="post-action" onclick="openComments(@post.Id)">
                         <i class="bi bi-chat-dots"></i>
                         <span>@post.Comentarios.Count</span>
-                    </a>
+                    </button>
 
                     <a asp-action="Edit" asp-route-id="@post.Id" class="post-action">
                         <i class="bi bi-pencil"></i>
@@ -65,6 +83,114 @@
                             <span>Excluir</span>
                         </button>
                     </form>
+                </div>
+            </div>
+
+            @* ─── MODAL DE COMENTÁRIOS ─── *@
+            <div id="comments-modal-@post.Id" class="comment-modal-overlay">
+                <div class="comment-modal-card">
+                    <div class="comment-modal-header">
+                        <h5><i class="bi bi-chat-dots text-primary me-2"></i>Comentários (@post.Comentarios.Count/6)</h5>
+                        <button type="button" class="comment-modal-close" onclick="closeComments(@post.Id)">&times;</button>
+                    </div>
+                    <div class="px-3 pt-2 pb-1 d-flex align-items-center justify-content-between border-bottom" style="border-color:var(--border-subtle);">
+                        <span class="badge bg-success" style="font-size:0.65rem;">@post.Topico</span>
+                        <a asp-controller="Post" asp-action="Detalhes" asp-route-id="@post.Id" class="small" style="color:var(--text-dim);text-decoration:none;">
+                            ver +
+                        </a>
+                    </div>
+
+                    <div class="comment-modal-body-wrapper">
+                        <div class="comment-modal-body">
+                            @if (post.Comentarios.Any())
+                            {
+                                @foreach (var c in post.Comentarios.OrderByDescending(x => x.DataCriacao).Take(6))
+                                {
+                                    <div class="comment-item">
+                                        @if (c.Usuario.FotoPerfil != null)
+                                        {
+                                            var fotoBase64 = Convert.ToBase64String(c.Usuario.FotoPerfil);
+                                            <img src="data:image;base64,@fotoBase64" class="comment-avatar" />
+                                        }
+                                        else
+                                        {
+                                            <div class="comment-avatar-placeholder">
+                                                <i class="bi bi-person-fill text-dim small"></i>
+                                            </div>
+                                        }
+                                        <div class="comment-body">
+                                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                                <span class="comment-author">@c.Usuario.NomeCompleto</span>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="comment-time">@c.DataCriacao.ToString("dd/MM")</span>
+                                                    @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                                                    {
+                                                        <form asp-controller="Admin" asp-action="ExcluirComentario" method="post" class="d-inline"
+                                                              onsubmit="return confirm('Excluir comentário?');">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="id" value="@c.Id" />
+                                                            <input type="hidden" name="postId" value="@post.Id" />
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size:0.65rem;line-height:1.2;">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="comment-text">@c.Conteudo</div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p class="text-muted small text-center py-3 mb-0">Nenhum comentário ainda.</p>
+                            }
+
+                            @if (post.Comentarios.Count >= 6)
+                            {
+                                <div class="alert alert-warning mt-2 mb-0 py-2 small">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Limite máximo de 6 comentários atingido.
+                                </div>
+                            }
+                        </div>
+
+                        @if (post.Imagem != null)
+                        {
+                            var imgBase64 = Convert.ToBase64String(post.Imagem);
+                            <div class="comment-modal-image-panel">
+                                <div class="floating-image">
+                                    <img src="data:image/png;base64,@imgBase64" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @if (User.Identity?.IsAuthenticated == true && post.Comentarios.Count < 6)
+                    {
+                        <div class="comment-modal-form">
+                            <form asp-controller="Post" asp-action="Comentar" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="postId" value="@post.Id" />
+                                <div class="mb-2">
+                                    <textarea name="NovoComentario" rows="2" placeholder="O que você acha?" maxlength="500"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="bi bi-send me-1"></i>Comentar
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else if (!User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="comment-modal-form text-center py-2">
+                            <p class="text-muted small mb-0">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>
+                                Faça <a asp-controller="Account" asp-action="Login">login</a> para comentar.
+                            </p>
+                        </div>
+                    }
                 </div>
             </div>
         }

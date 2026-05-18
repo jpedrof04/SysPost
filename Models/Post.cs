@@ -29,6 +29,7 @@ namespace SysPost.Models
         public DateTime DataCriacao { get; set; } = DateTime.Now;
 
         public ICollection<Comment> Comentarios { get; set; } = new List<Comment>();
+        public ICollection<PostLike> Likes { get; set; } = new List<PostLike>();
 
         // FK usuário
         [Required]

@@ -52,11 +52,20 @@ namespace SysPost.Data
             UserManager<Usuario> userManager)
         {
             //roles
-            foreach (var role in new[] { "Admin", "User" })
+            foreach (var role in new[] { "SuperAdmin", "Admin", "User" })
             {
                 if (!await roleManager.RoleExistsAsync(role))
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
+
+            //Super Admin
+            await CriarUsuarioSeNaoExistir(userManager,
+                email: "super@sis.com",
+                senha: "Super@123",
+                nome: "Super Admin",
+                bio: "Conta de super administrador",
+                role: "SuperAdmin"
+            );
 
             //Admin padrão
             await CriarUsuarioSeNaoExistir(userManager,

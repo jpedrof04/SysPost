@@ -86,12 +86,13 @@ public class PostController : Controller
         }
 
         var usuario = await _userManager.GetUserAsync(User);
+        if (usuario == null) return Challenge();
 
         var comment = new Comment
         {
             Conteudo = model.NovoComentario.Trim(),
             PostId = postId,
-            UsuarioId = usuario!.Id,
+            UsuarioId = usuario.Id,
             DataCriacao = DateTime.Now
         };
 
@@ -110,6 +111,9 @@ public class PostController : Controller
         var usuario = await _userManager.GetUserAsync(User);
 
         var posts = await _context.Posts
+            .Include(p => p.Usuario)
+            .Include(p => p.Comentarios)
+                .ThenInclude(c => c.Usuario)
             .Where(p => p.UsuarioId == usuario!.Id)
             .OrderByDescending(p => p.DataCriacao)
             .ToListAsync();
@@ -135,6 +139,9 @@ public class PostController : Controller
 
         var usuario = await _userManager.GetUserAsync(User);
 
+        if (usuario == null)
+            return Challenge();
+
         byte[]? imagemBytes = null;
 
         if (model.Imagem != null)
@@ -154,7 +161,7 @@ public class PostController : Controller
             InformacaoEspecial = model.InformacaoEspecial,
             Topico = model.Topico,
             Imagem = imagemBytes,
-            UsuarioId = usuario!.Id,
+            UsuarioId = usuario.Id,
             DataCriacao = DateTime.Now
         };
 
@@ -174,11 +181,12 @@ public class PostController : Controller
     public async Task<IActionResult> Edit(int id)
     {
         var usuario = await _userManager.GetUserAsync(User);
+        if (usuario == null) return Challenge();
 
         var post = await _context.Posts
             .FirstOrDefaultAsync(p =>
                 p.Id == id &&
-                p.UsuarioId == usuario!.Id);
+                p.UsuarioId == usuario.Id);
 
         if (post == null)
             return NotFound();
@@ -205,11 +213,12 @@ public class PostController : Controller
             return View(model);
 
         var usuario = await _userManager.GetUserAsync(User);
+        if (usuario == null) return Challenge();
 
         var post = await _context.Posts
             .FirstOrDefaultAsync(p =>
                 p.Id == model.Id &&
-                p.UsuarioId == usuario!.Id);
+                p.UsuarioId == usuario.Id);
 
         if (post == null)
             return NotFound();
@@ -242,12 +251,13 @@ public class PostController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         var usuario = await _userManager.GetUserAsync(User);
+        if (usuario == null) return Challenge();
 
         var post = await _context.Posts
             .Include(p => p.Comentarios)
             .FirstOrDefaultAsync(p =>
                 p.Id == id &&
-                p.UsuarioId == usuario!.Id);
+                p.UsuarioId == usuario.Id);
 
         if (post == null)
             return NotFound();
@@ -270,6 +280,8 @@ public class PostController : Controller
     {
         var posts = await _context.Posts
             .Include(p => p.Usuario)
+            .Include(p => p.Comentarios)
+                .ThenInclude(c => c.Usuario)
             .OrderByDescending(p => p.DataCriacao)
             .ToListAsync();
 
@@ -299,5 +311,41 @@ public class PostController : Controller
         TempData["Sucesso"] = "Post apagado pelo admin.";
 
         return RedirectToAction(nameof(Todos));
+    }
+
+    // =========================
+    // LIKE / UNLIKE
+    // =========================
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Like(int postId)
+    {
+        var usuario = await _userManager.GetUserAsync(User);
+        if (usuario == null)
+            return Challenge();
+
+        var existing = await _context.PostLikes
+            .FirstOrDefaultAsync(l => l.PostId == postId && l.UsuarioId == usuario.Id);
+
+        if (existing != null)
+        {
+            _context.PostLikes.Remove(existing);
+        }
+        else
+        {
+            _context.PostLikes.Add(new PostLike
+            {
+                PostId = postId,
+                UsuarioId = usuario.Id
+            });
+        }
+
+        await _context.SaveChangesAsync();
+
+        var referer = Request.Headers["Referer"].ToString();
+        if (!string.IsNullOrEmpty(referer))
+            return Redirect(referer);
+
+        return RedirectToAction("Index", "Home");
     }
 }

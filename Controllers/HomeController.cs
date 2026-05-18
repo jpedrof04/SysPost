@@ -22,11 +22,12 @@ namespace SysPost.Controllers
         }
 
 
-        public async Task<IActionResult> Index(string? usuarioNome, TopicoPost? topico)
+        public async Task<IActionResult> Index(string? usuarioNome, TopicoPost? topico, string? ordenar)
         {
             var query = _context.Posts
                 .Include(p => p.Usuario)
                 .Include(p => p.Comentarios)
+                .Include(p => p.Likes)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(usuarioNome))
@@ -35,51 +36,32 @@ namespace SysPost.Controllers
             if (topico.HasValue)
                 query = query.Where(p => p.Topico == topico.Value);
 
-            var posts = await query
-                .OrderByDescending(p => p.DataCriacao)
-                .ToListAsync();
+            IOrderedQueryable<Post> ordered;
+            if (ordenar == "likes")
+                ordered = query.OrderByDescending(p => p.Likes.Count);
+            else
+                ordered = query.OrderByDescending(p => p.DataCriacao);
+
+            var posts = await ordered.ToListAsync();
 
             ViewBag.Posts = posts;
             ViewBag.FiltroUsuarioNome = usuarioNome;
             ViewBag.FiltroTopico = topico;
+            ViewBag.FiltroOrdenar = ordenar;
 
             // VISITANTE
-            if (User.Identity?.IsAuthenticated != true)
+            if (User.Identity?.IsAuthenticated == true)
             {
-                ViewBag.DbQueries = _monitor.QueryCount;
-                ViewBag.DbTimeMs = Math.Round(_monitor.TotalTimeMs, 2);
-                ViewBag.DbLastMs = Math.Round(_monitor.LastQueryMs, 2);
-                return View();
+                var usuarioLogado = await _userManager.GetUserAsync(User);
+                if (usuarioLogado != null)
+                    ViewBag.CurrentUserId = usuarioLogado.Id;
             }
-
-            // USUÁRIO LOGADO
-            var usuario = await _userManager.GetUserAsync(User);
-
-            if (usuario == null)
-            {
-                ViewBag.DbQueries = _monitor.QueryCount;
-                ViewBag.DbTimeMs = Math.Round(_monitor.TotalTimeMs, 2);
-                ViewBag.DbLastMs = Math.Round(_monitor.LastQueryMs, 2);
-                return View();
-            }
-
-            var roles = await _userManager.GetRolesAsync(usuario);
-
-            var vm = new PerfilViewModel
-            {
-                NomeCompleto = usuario.NomeCompleto,
-                Email = usuario.Email ?? "",
-                Bio = usuario.Bio,
-                FotoPerfil = usuario.FotoPerfil,
-                DataCadastro = usuario.DataCadastro,
-                Perfil = roles.FirstOrDefault() ?? "User"
-            };
 
             ViewBag.DbQueries = _monitor.QueryCount;
             ViewBag.DbTimeMs = Math.Round(_monitor.TotalTimeMs, 2);
             ViewBag.DbLastMs = Math.Round(_monitor.LastQueryMs, 2);
 
-            return View(vm);
+            return View();
         }
     }
 }

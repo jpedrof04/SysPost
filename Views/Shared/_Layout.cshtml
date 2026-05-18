@@ -49,7 +49,7 @@
                         <span>Minha Área</span>
                     </a>
 
-                    @if (User.IsInRole("Admin"))
+                    @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
                     {
                         <a asp-controller="Admin" asp-action="Index" class="sidebar-link admin-link">
                             <i class="bi bi-shield-fill-check"></i>

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SysPost.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public class AdminController : Controller
     {
         private readonly UserManager<Usuario> _userManager;
@@ -35,12 +35,16 @@ namespace SysPost.Controllers
             foreach (var u in usuarios)
             {
                 var roles = await _userManager.GetRolesAsync(u);
-                listaComRoles.Add((u, roles));
+                if (!roles.Contains("SuperAdmin"))
+                    listaComRoles.Add((u, roles));
             }
             ViewBag.UsuariosComRoles = listaComRoles;
+            ViewBag.EhSuperAdmin = User.IsInRole("SuperAdmin");
 
             var posts = await _context.Posts
                 .Include(p => p.Usuario)
+                .Include(p => p.Comentarios)
+                    .ThenInclude(c => c.Usuario)
                 .OrderByDescending(p => p.DataCriacao)
                 .ToListAsync();
             ViewBag.TodosPosts = posts;
@@ -61,7 +65,14 @@ namespace SysPost.Controllers
                 return RedirectToAction("Index");
             }
 
-            if (!await _userManager.IsInRoleAsync(usuario, "Admin"))
+            var roles = await _userManager.GetRolesAsync(usuario);
+            if (roles.Contains("SuperAdmin"))
+            {
+                TempData["Erro"] = "Não é possível alterar um Super Admin.";
+                return RedirectToAction("Index");
+            }
+
+            if (!roles.Contains("Admin"))
             {
                 await _userManager.RemoveFromRoleAsync(usuario, "User");
                 await _userManager.AddToRoleAsync(usuario, "Admin");
@@ -88,6 +99,13 @@ namespace SysPost.Controllers
                 return RedirectToAction("Index");
             }
 
+            var roles = await _userManager.GetRolesAsync(usuario);
+            if (roles.Contains("SuperAdmin"))
+            {
+                TempData["Erro"] = "Não é possível alterar um Super Admin.";
+                return RedirectToAction("Index");
+            }
+
             var usuarioAtual = await _userManager.GetUserAsync(User);
             if (usuarioAtual?.Id == userId)
             {
@@ -95,12 +113,67 @@ namespace SysPost.Controllers
                 return RedirectToAction("Index");
             }
 
-            if (await _userManager.IsInRoleAsync(usuario, "Admin"))
+            if (roles.Contains("Admin"))
             {
                 await _userManager.RemoveFromRoleAsync(usuario, "Admin");
                 await _userManager.AddToRoleAsync(usuario, "User");
                 TempData["Sucesso"] = $"{usuario.NomeCompleto} agora é Usuário comum.";
             }
+
+            return RedirectToAction("Index");
+        }
+
+        // ─── EXCLUIR USUÁRIO (apenas SuperAdmin) ────────────────────
+
+        [Authorize(Roles = "SuperAdmin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExcluirUsuario(string userId)
+        {
+            var usuario = await _userManager.FindByIdAsync(userId);
+            if (usuario == null)
+            {
+                TempData["Erro"] = "Usuário não encontrado.";
+                return RedirectToAction("Index");
+            }
+
+            var roles = await _userManager.GetRolesAsync(usuario);
+            if (roles.Contains("SuperAdmin"))
+            {
+                TempData["Erro"] = "Não é possível excluir um Super Admin.";
+                return RedirectToAction("Index");
+            }
+
+            var usuarioAtual = await _userManager.GetUserAsync(User);
+            if (usuarioAtual?.Id == userId)
+            {
+                TempData["Erro"] = "Você não pode excluir a si mesmo.";
+                return RedirectToAction("Index");
+            }
+
+            var posts = await _context.Posts
+                .Include(p => p.Comentarios)
+                .Where(p => p.UsuarioId == userId)
+                .ToListAsync();
+
+            foreach (var post in posts)
+            {
+                _context.Comments.RemoveRange(post.Comentarios);
+            }
+            _context.Posts.RemoveRange(posts);
+
+            var comments = await _context.Comments
+                .Where(c => c.UsuarioId == userId)
+                .ToListAsync();
+            _context.Comments.RemoveRange(comments);
+
+            await _context.SaveChangesAsync();
+
+            var resultado = await _userManager.DeleteAsync(usuario);
+            if (resultado.Succeeded)
+                TempData["Sucesso"] = $"Usuário {usuario.NomeCompleto} foi excluído.";
+            else
+                TempData["Erro"] = "Erro ao excluir usuário.";
 
             return RedirectToAction("Index");
         }
