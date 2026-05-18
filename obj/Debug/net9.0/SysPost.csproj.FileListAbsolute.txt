@@ -161,9 +161,7 @@ C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\rjsmcshtml.dswa.cache
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\scopedcss\bundle\SysPost.styles.css
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\scopedcss\projectbundle\SysPost.bundle.scp.css
-C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\dzl11qtb08-nvuw5gq9rq.gz
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\n187m2eri8-61n19gt1b8.gz
-C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\j0hgdugvgf-wsi5lfpslz.gz
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\acka2vj8hu-t1cqhe9u97.gz
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\ysl7k8oisl-c2jlpeoesf.gz
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\w950bfeisg-sejl45xvog.gz
@@ -235,3 +233,5 @@ C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\refint\SysPost.dll
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\SysPost.pdb
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\SysPost.genruntimeconfig.cache
 C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\ref\SysPost.dll
+C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\dzl11qtb08-knq33ccw6u.gz
+C:\Users\alunobcc09\Desktop\MY-WS\SysPost\obj\Debug\net9.0\compressed\j0hgdugvgf-egulm825zi.gz

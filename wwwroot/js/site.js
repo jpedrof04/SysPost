@@ -15,6 +15,17 @@ document.addEventListener('click', function (e) {
   }
 });
 
+function toggleSidebar() {
+  document.querySelector('.feed-sidebar').classList.toggle('show-sidebar');
+}
+
+document.addEventListener('click', function (e) {
+  if (e.target.classList.contains('comment-modal-overlay')) {
+    e.target.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+});
+
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') {
     document.querySelectorAll('.comment-modal-overlay.show').forEach(function (el) {

@@ -12,6 +12,11 @@
 }
 
 
+<button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Filtros e monitor">
+    <i class="bi bi-funnel"></i>
+    <span>Filtros</span>
+</button>
+
 <div class="feed-layout">
 
     <!-- ─── POSTS ─── -->
@@ -148,7 +153,7 @@
                                                                 @Html.AntiForgeryToken()
                                                                 <input type="hidden" name="id" value="@c.Id" />
                                                                 <input type="hidden" name="postId" value="@post.Id" />
-                                                                <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size:0.65rem;line-height:1.2;">
+                                                                <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-2">
                                                                     <i class="bi bi-trash"></i>
                                                                 </button>
                                                             </form>
