@@ -66,10 +66,7 @@
 
                         @if (!string.IsNullOrEmpty(post.InformacaoEspecial))
                         {
-                            <div class="card-info-section info-special">
-                                <i class="bi bi-code-slash me-1"></i>
-                                @post.InformacaoEspecial
-                            </div>
+                            <pre class="card-info-section info-special"><i class="bi bi-code-slash me-1"></i>@post.InformacaoEspecial</pre>
                         }
                     </div>
 

@@ -418,6 +418,18 @@ body {
   color: var(--twitch-purple);
 }
 
+pre.card-info-section.info-special {
+  font-family: inherit;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
 .post-card-desc-more {
   font-size: 0.75rem;
   color: var(--text-dim);

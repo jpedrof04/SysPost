@@ -168,13 +168,10 @@
                         <div class="card-info-section">@post.Detalhamento</div>
                     }
 
-                    @if (!string.IsNullOrEmpty(post.InformacaoEspecial))
-                    {
-                        <div class="card-info-section info-special">
-                            <i class="bi bi-code-slash me-1"></i>
-                            @post.InformacaoEspecial
-                        </div>
-                    }
+                        @if (!string.IsNullOrEmpty(post.InformacaoEspecial))
+                        {
+                            <pre class="card-info-section info-special"><i class="bi bi-code-slash me-1"></i>@post.InformacaoEspecial</pre>
+                        }
                 </div>
 
                 @if (post.Imagem != null)

@@ -27,6 +27,7 @@ namespace SysPost.Controllers
             var query = _context.Posts
                 .Include(p => p.Usuario)
                 .Include(p => p.Comentarios)
+                    .ThenInclude(c => c.Usuario)
                 .Include(p => p.Likes)
                 .AsQueryable();
 
